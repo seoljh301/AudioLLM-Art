@@ -1,0 +1,38 @@
+codec:
+  name: encodec_24khz
+  device: "cuda:1"
+  bandwidth: 6.0
+
+bend:
+  mode: bit_flip
+  rate: 0.03
+  quantizer_range: null
+  auto_upper_fraction: 0.33
+  shuffle_window: 12
+  codebook_size: 1024
+
+render:
+  chunk_seconds: 4.0
+  overlap_seconds: 0.05
+
+mix:
+  dry_wet: 0.40
+  rms_match: true
+  limiter: true
+  limiter_drive: 1.0
+
+governor:
+  enabled: true
+  min_wet: 0.10
+  flatness_max: 0.55
+  rms_min: 0.0001
+  rms_max: 0.85
+  centroid_max_ratio: 0.42
+
+osc:
+  listen_host: 127.0.0.1
+  listen_port: 5007
+  target_host: 127.0.0.1
+  target_port: 5008
+
+seed: 42

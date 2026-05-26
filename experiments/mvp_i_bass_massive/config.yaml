@@ -1,0 +1,25 @@
+codec:
+  name: encodec_24khz
+  device: "cuda:1"
+
+massive:
+  smear_delay: 8              # 8 frames delay for coarse layers (~100ms)
+  smear_quantizers: [0, 2]
+  jitter_rate: 0.05           # 5% probability of index jitter
+  jitter_quantizers: [0, 3]
+  fold_leak_rate: 0.10        # 10% probability of leaking detail into coarse
+  fold_source_range: [16, 24] # Deep detail layers
+  fold_target_range: [0, 2]   # Coarse layers
+
+render:
+  chunk_seconds: 4.0
+
+mix:
+  dry_wet: 0.70               # High wetness to hear the massive effects
+  low_anchor_hz: 80.0         # Protect original sub-bass
+  sub_boost_db: 4.0           # Extra impact
+
+governor:
+  enabled: true
+
+seed: 1234

@@ -1,0 +1,37 @@
+{
+  "status": "wired (stub backends)",
+  "caption_backend": "stub",
+  "tta_backend": "stub",
+  "model_note": "Stubs: deterministic spectral-stats text + FM synth from text hash. Verifies loop control flow only. Set caption.backend=qwen2_audio + tta.backend=audioldm2 in config and authorize ~18 GB of HF downloads for real semantic drift.",
+  "sample_rate": 16000,
+  "device": "cpu",
+  "seed_audio": "runs/mvp_b/seed_16k.wav",
+  "seed_description": "4s synthetic: 220+440Hz tones + light noise, 16kHz mono",
+  "runs": [
+    {
+      "name": "loop_stub_depth6",
+      "output_dir": "runs/mvp_b/loop_stub",
+      "loop": {"depth": 6, "text_mutation_prob": 0.3, "seed": 0},
+      "history": [
+        {"step": 0, "audio": "step_00_seed.wav", "rms": 0.4088, "centroid_hz": 3790.2},
+        {"step": 1, "text": "a harsh pulsing sound through a wall",        "audio": "step_01.wav", "rms": 0.3837, "centroid_hz": 1574.2},
+        {"step": 2, "text": "a metallic drifting sound in a cave",         "audio": "step_02.wav", "rms": 0.3703, "centroid_hz": 2001.9},
+        {"step": 3, "text": "a wooden swelling sound underwater",          "audio": "step_03.wav", "rms": 0.3498, "centroid_hz": 2752.6},
+        {"step": 4, "text": "impossible a glassy pulsing sound from below","audio": "step_04.wav", "rms": 0.3207, "centroid_hz": 3172.8, "mutated": true},
+        {"step": 5, "text": "a vocal shimmering sound in static",          "audio": "step_05.wav", "rms": 0.3673, "centroid_hz": 3244.1},
+        {"step": 6, "text": "a vocal drifting sound underwater",           "audio": "step_06.wav", "rms": 0.3231, "centroid_hz": 3325.1}
+      ]
+    }
+  ],
+  "observations": [
+    "Captions traverse vocabulary deterministically: seed -> harsh -> metallic -> wooden -> glassy -> vocal -> vocal",
+    "Mutation pool prepended 'impossible' to step 4 caption (text_mutation_prob=0.3, seed=0)",
+    "Spectral centroid drifts from 3790 -> 1574 -> ... -> 3325 Hz; non-monotonic recursive feedback",
+    "RMS roughly stable 0.32-0.38 (FM stub auto-normalizes)"
+  ],
+  "open_questions": [
+    "Enable qwen2_audio + audioldm2 backends — needs ~18 GB HF download authorization and V100 GPU support (currently blocked by torch 2.12 cu130 SM 7.5 requirement)",
+    "Pin torch<=2.4 + cu121 for V100, or run real models on CPU (very slow for Qwen2-Audio 7B)",
+    "Add text mutation strategies beyond adjective insertion: word deletion, synonym swap, back-translation"
+  ]
+}

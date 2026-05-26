@@ -1,0 +1,30 @@
+model:
+  path: checkpoints/rave/guitar_iil_b2048_r48000_z16.ts
+  device: "cuda:1"
+
+granular:
+  grain_size: 24              # Latent frames
+  memory_size: 4096           # History (~40s)
+  num_grains: 6               # Overlap density
+  mix: 0.65                   # Latent-level mix
+
+render:
+  chunk_seconds: 4.0
+  overlap_seconds: 0.05
+
+mix:
+  dry_wet: 0.75
+  rms_match: true
+  limiter: true
+  low_anchor_hz: 100.0        # Anchor the bass
+  sub_boost_db: 2.0
+
+governor:
+  enabled: true
+  min_wet: 0.20
+  flatness_max: 0.60
+  rms_min: 0.0001
+  rms_max: 0.90
+  centroid_max_ratio: 0.45
+
+seed: 999

@@ -1,0 +1,10 @@
+codec:
+  name: encodec_24khz
+  device: "cuda:1"
+
+organ:
+  mode: prime                # prime | fibonacci | random_walk
+  stride: 2                  # spread between quantizer layers
+  duration_frames: 13500     # ~3 minutes (180s * 75fps)
+
+seed: 777

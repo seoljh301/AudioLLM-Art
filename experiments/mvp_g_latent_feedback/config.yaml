@@ -1,0 +1,20 @@
+model:
+  path: checkpoints/rave/guitar_iil_b2048_r48000_z16.ts
+  device: "cuda:1"
+
+feedback:
+  delay_frames: 64            # ~700ms delay
+  feedback: 0.6               # Strong resonance
+  mix: 0.7                    # Latent mix favoring the echo
+
+render:
+  chunk_seconds: 4.0
+
+mix:
+  dry_wet: 0.4                # Overall wetness
+  low_anchor_hz: 100.0
+
+governor:
+  enabled: true
+
+seed: 42

@@ -1,0 +1,23 @@
+checkpoints:
+  paths:
+    - checkpoints/rave/guitar_iil_b2048_r48000_z16.ts
+    - checkpoints/rave/organ_archive_b2048_r48000_z16.ts
+device: "cuda:1"
+rebasin: true
+rebasin_mode: partial
+morph:
+  mode: linear
+  t: 0.005
+perturb:
+  noise_scale: 0.05
+  noise_mode: smoothed
+render:
+  chunk_seconds: 4.0
+mix:
+  dry_wet: 0.35               # Higher than ghost layer (0.15)
+  rms_match: true
+  limiter: true
+  low_anchor_hz: 150.0        # Maintain the bass line through the chain
+governor:
+  enabled: true
+  min_wet: 0.10

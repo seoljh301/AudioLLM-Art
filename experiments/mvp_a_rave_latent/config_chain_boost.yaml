@@ -1,0 +1,17 @@
+model:
+  device: "cuda:1"
+  path: checkpoints/rave/guitar_iil_b2048_r48000_z16.ts
+perturb:
+  noise_scale: 0.12
+  noise_mode: smoothed
+render:
+  chunk_seconds: 4.0
+mix:
+  dry_wet: 0.70
+  rms_match: true
+  limiter: true
+  low_anchor_hz: 80.0
+  sub_boost_db: 3.5           # Stronger boost for sub-bass
+governor:
+  enabled: true
+  min_wet: 0.20

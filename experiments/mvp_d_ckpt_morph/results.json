@@ -1,0 +1,168 @@
+{
+  "status": "wired (real RAVE pair) + stub validation",
+  "checkpoints": [
+    "checkpoints/rave/guitar_iil_b2048_r48000_z16.ts (IRCAM IIL guitar, ~156 MB)",
+    "checkpoints/rave/organ_archive_b2048_r48000_z16.ts (IRCAM IIL organ archive, ~156 MB)"
+  ],
+  "stub_checkpoints": ["checkpoints/rave/stub_a.ts (seed=0)", "checkpoints/rave/stub_b.ts (seed=1)"],
+  "sample_rate": 48000,
+  "latent_dim": 16,
+  "device": "cuda (V100, torch 2.4.1+cu121)",
+  "input_signal": "runs/mvp_a/sine_test_in_48k.wav",
+  "stub_runs": [
+    {"name": "lin_t00",   "mode": "linear",      "t": 0.00, "dist_to_a": 0.0000, "dist_to_b": 0.0104},
+    {"name": "lin_t025",  "mode": "linear",      "t": 0.25, "dist_to_a": 0.0036, "dist_to_b": 0.0085},
+    {"name": "lin_t05",   "mode": "linear",      "t": 0.50, "dist_to_a": 0.0062, "dist_to_b": 0.0065},
+    {"name": "lin_t075",  "mode": "linear",      "t": 0.75, "dist_to_a": 0.0081, "dist_to_b": 0.0039},
+    {"name": "lin_t10",   "mode": "linear",      "t": 1.00, "dist_to_a": 0.0104, "dist_to_b": 0.0000},
+    {"name": "slerp_t05", "mode": "slerp",       "t": 0.50, "dist_to_a": 0.0074, "dist_to_b": 0.0074},
+    {"name": "walk_005",  "mode": "random_walk", "walk_step": 0.05, "rms": 0.1993},
+    {"name": "walk_020",  "mode": "random_walk", "walk_step": 0.20, "rms": 0.6447}
+  ],
+  "ad_chain_sweep": {
+    "description": "Combined MVP-D weight morph (t) + MVP-A latent perturbation. Tests whether latent perturbation can rescue the silent plateau, and characterizes per-instrument sensitivity to perturbation.",
+    "output_dir": "runs/mvp_ad/",
+    "grid": "t ∈ {0.0, 0.005, 0.02, 0.50, 0.98, 0.995, 1.0} × perturb ∈ {clean, noise_scale=0.3, noise_scale=1.0, dim_dropout=0.3}",
+    "table_rms": [
+      {"t": 0.000, "clean": 0.4046, "noise03": 0.4135, "noise10": 0.4353, "drop03": 0.7260},
+      {"t": 0.005, "clean": 0.2974, "noise03": 0.3036, "noise10": 0.3298, "drop03": 0.6796},
+      {"t": 0.020, "clean": 0.1342, "noise03": 0.1390, "noise10": 0.1375, "drop03": 0.4008},
+      {"t": 0.500, "clean": 0.0005, "noise03": 0.0005, "noise10": 0.0005, "drop03": 0.0005},
+      {"t": 0.980, "clean": 0.1512, "noise03": 0.1550, "noise10": 0.1628, "drop03": 0.1156},
+      {"t": 0.995, "clean": 0.2389, "noise03": 0.2623, "noise10": 0.2589, "drop03": 0.1827},
+      {"t": 1.000, "clean": 0.3160, "noise03": 0.3302, "noise10": 0.3109, "drop03": 0.2116}
+    ],
+    "findings": [
+      "Latent perturbation does NOT rescue the silent plateau at t=0.5 — all perturb modes still produce rms 0.0005. The model collapse is upstream of the latent, no decoder magic can recover output from a broken weight blend.",
+      "dim_dropout asymmetry: at guitar end (t=0) drop03 amplifies output 1.8x (0.40 -> 0.73); at organ end (t=1) drop03 SUPPRESSES output 0.67x (0.32 -> 0.21). Different instrument-specific latent geometries — guitar has 'inhibitory' latent dims that, when silenced, let others fire louder; organ doesn't.",
+      "noise_scale has surprisingly small effect on rms across all t — gaussian noise added to latent largely averages out through decoder smoothing. Use noise for shape change, not amplitude change.",
+      "Chain useful region: t ∈ [0, 0.02] paired with drop03 keeps rms 0.40-0.73 — strongly audible 'breaking guitar' that's also denser/dirtier than pure latent perturbation alone."
+    ]
+  },
+  "dropout_intensity_sweep_bilateral": {
+    "description": "Full dim_dropout intensity sweep at both endpoint regions. Confirms (and refines) the guitar/organ asymmetry: response curves are qualitatively different.",
+    "output_dirs": ["runs/mvp_ad/guitar/", "runs/mvp_ad/organ/"],
+    "guitar_side_table_rms": [
+      {"t": 0.000, "d_0.0": 0.4043, "d_0.1": 0.4713, "d_0.2": 0.5668, "d_0.3": 0.7613, "d_0.5": 0.7595, "d_0.7": 0.3465},
+      {"t": 0.002, "d_0.0": 0.3529, "d_0.1": 0.4249, "d_0.2": 0.5227, "d_0.3": 0.7170, "d_0.5": 0.7798, "d_0.7": 0.2950},
+      {"t": 0.005, "d_0.0": 0.3005, "d_0.1": 0.3836, "d_0.2": 0.4836, "d_0.3": 0.7096, "d_0.5": 0.7160, "d_0.7": 0.3098},
+      {"t": 0.010, "d_0.0": 0.2220, "d_0.1": 0.3423, "d_0.2": 0.4198, "d_0.3": 0.5596, "d_0.5": 0.6172, "d_0.7": 0.2209},
+      {"t": 0.020, "d_0.0": 0.1361, "d_0.1": 0.2221, "d_0.2": 0.2697, "d_0.3": 0.4361, "d_0.5": 0.4737, "d_0.7": 0.1590},
+      {"t": 0.050, "d_0.0": 0.0405, "d_0.1": 0.0687, "d_0.2": 0.0909, "d_0.3": 0.1439, "d_0.5": 0.1415, "d_0.7": 0.0618},
+      {"t": 0.100, "d_0.0": 0.0083, "d_0.1": 0.0106, "d_0.2": 0.0146, "d_0.3": 0.0179, "d_0.5": 0.0193, "d_0.7": 0.0089}
+    ],
+    "organ_side_table_rms": [
+      {"t": 1.000, "d_0.0": 0.3160, "d_0.1": 0.3833, "d_0.2": 0.3930, "d_0.3": 0.2062, "d_0.5": 0.2274, "d_0.7": 0.1134},
+      {"t": 0.998, "d_0.0": 0.2894, "d_0.1": 0.3522, "d_0.2": 0.3630, "d_0.3": 0.1802, "d_0.5": 0.1832, "d_0.7": 0.1227},
+      {"t": 0.995, "d_0.0": 0.2747, "d_0.1": 0.3426, "d_0.2": 0.3344, "d_0.3": 0.1719, "d_0.5": 0.1973, "d_0.7": 0.1019},
+      {"t": 0.990, "d_0.0": 0.2379, "d_0.1": 0.2539, "d_0.2": 0.2859, "d_0.3": 0.1680, "d_0.5": 0.1616, "d_0.7": 0.0664},
+      {"t": 0.980, "d_0.0": 0.1706, "d_0.1": 0.1932, "d_0.2": 0.1948, "d_0.3": 0.1216, "d_0.5": 0.1339, "d_0.7": 0.0635},
+      {"t": 0.950, "d_0.0": 0.0507, "d_0.1": 0.0649, "d_0.2": 0.0627, "d_0.3": 0.0423, "d_0.5": 0.0480, "d_0.7": 0.0196},
+      {"t": 0.900, "d_0.0": 0.0083, "d_0.1": 0.0105, "d_0.2": 0.0101, "d_0.3": 0.0085, "d_0.5": 0.0089, "d_0.7": 0.0052}
+    ],
+    "findings": [
+      "Guitar side: monotonic amplification up to peak at d ∈ [0.3, 0.5] (~1.9x base rms), then sharp collapse at d=0.7. Suggests guitar's latent has many small-magnitude inhibitory dims — silencing more lets surviving dims fire louder, until too many are gone and the signal collapses.",
+      "Organ side: small bump at d ∈ [0.1, 0.2] (~1.2x), DISTINCT DIP at d=0.3 (down to 0.65x base), partial recovery at d=0.5, collapse at d=0.7. Suggests organ has a few critical latent dims with a high probability of being hit at d=0.3 — knocking out a harmonic-defining dim kills part of the timbre.",
+      "Earlier observation that 'drop03 suppresses organ' was actually catching the SPECIFIC dip — not a monotonic suppression. Set d=0.1 or d=0.2 for amplification on organ side; set d=0.3 or d=0.7 for suppression.",
+      "Patterns hold across the entire fade zone (t ∈ [0, 0.05] guitar; [0.95, 1.0] organ) — instrument-specific latent geometry is preserved through small weight morphs."
+    ],
+    "presets": [
+      {"name": "amp_guitar_breaking",    "t": 0.005, "dim_dropout": 0.3, "rms": 0.71, "vibe": "loud-and-dirty breaking guitar"},
+      {"name": "amp_organ_warm",         "t": 0.998, "dim_dropout": 0.2, "rms": 0.36, "vibe": "warmer, fuller organ"},
+      {"name": "dip_organ_thinned",      "t": 1.000, "dim_dropout": 0.3, "rms": 0.21, "vibe": "thinned organ — harmonic notch"},
+      {"name": "collapse_either_extreme","t": 0.000, "dim_dropout": 0.7, "rms": 0.35, "vibe": "shattered guitar"}
+    ]
+  },
+  "cliff_sweep_guitar_organ": {
+    "description": "Fine sweep of t to characterize where collapse starts. Linear interp, no rebasin.",
+    "output_dir": "runs/mvp_d/cliff/",
+    "table": [
+      {"t": 0.0000, "rms": 0.4000, "dist_A": 0.0000, "dist_B": 0.4323, "note": "pure guitar"},
+      {"t": 0.0005, "rms": 0.3993, "dist_A": 0.4414, "dist_B": 0.4314, "note": "rms ~unchanged but shape decoheres (high dist_A despite small weight shift)"},
+      {"t": 0.0010, "rms": 0.3772, "dist_A": 0.4311, "dist_B": 0.4163},
+      {"t": 0.0020, "rms": 0.3545},
+      {"t": 0.0050, "rms": 0.2996},
+      {"t": 0.0100, "rms": 0.2226, "note": "halfway-fade musical region — still audible, distinctly degraded"},
+      {"t": 0.0200, "rms": 0.1352},
+      {"t": 0.0500, "rms": 0.0396, "note": "near-silent threshold"},
+      {"t": 0.1000, "rms": 0.0085, "note": "collapse begins"},
+      {"t": 0.2000, "rms": 0.0010},
+      {"t": 0.5000, "rms": 0.0005, "note": "deepest silence"},
+      {"t": 0.8000, "rms": 0.0013},
+      {"t": 0.9000, "rms": 0.0080, "note": "emergence begins (organ side)"},
+      {"t": 0.9500, "rms": 0.0493},
+      {"t": 0.9800, "rms": 0.1885},
+      {"t": 0.9900, "rms": 0.2288},
+      {"t": 0.9950, "rms": 0.2824},
+      {"t": 0.9990, "rms": 0.3024},
+      {"t": 1.0000, "rms": 0.2917, "note": "pure organ"}
+    ],
+    "findings": [
+      "Sharp rms cliff at each endpoint over t ∈ [0.001, 0.05] — energy decays ~10x per decade of t",
+      "Silent plateau t ∈ [0.10, 0.90] — model 'hollowed out', identity erased",
+      "Useful musical regions near endpoints: t ∈ [0, 0.02] (guitar fading) and t ∈ [0.98, 1.0] (organ fading)",
+      "At t=0.0005, rms is virtually unchanged but dist_A jumps to 0.44 — micro-weight shifts completely decohere the audio shape while preserving energy. Implies the model is highly sensitive to weight perturbation in a chaotic way, not gradual.",
+      "rms recovery near organ endpoint is not symmetric in absolute energy: organ peaks at 0.29 while guitar at 0.40 — different timbres normalize differently"
+    ]
+  },
+  "rebasin_attempt": {
+    "method": "Inner-block channel permutation (Ainsworth et al. 2023, partial)",
+    "scope": "21 paired resblocks in encoder + decoder; grouped-conv aware (groups inferred from cache shape)",
+    "implementation": "src/modules/mvp_d/re_basin.py — _compute_inner_perm + _apply_block_perm",
+    "outcome": "Does NOT prevent collapse at intermediate t. Intra-block alignment is too local — encoder/decoder boundary convs (.0, .2, .4, .6, .8, .10, .12, .14, .16) and the gimbal/prior_net/latent_pca chains all carry channel dependencies that this partial Re-Basin does not touch.",
+    "diagnostic": "Same-session A/B render at t=0.5 with rebasin=True: rms 0.0005 — identical collapse to naive interp.",
+    "note": "RAVE's full permutation-symmetry graph would need: (1) encoder boundary channels (encoder.net.0 -> .1, .2.bias <-> .1.weight in_dim, etc.), (2) decoder symmetric chain, (3) gimbal log_a/b (128-dim latent coupling), (4) prior_net inner perms, (5) latent_pca rotation aligned to (3). Implementing that requires reading the RAVE source and is deferred."
+  },
+  "rebasin_full_attempt": {
+    "method": "Full encoder Re-Basin: 4 chain classes (enc_48/96/192/384) + 7 resblock inner classes + tied-group handling for grouped consumer convs (.5/.7/.9/.11/.13/.16)",
+    "implementation": "src/modules/mvp_d/re_basin_full.py — PermClass with tied_groups/sub_groups + iterative weight matching (Ainsworth Algorithm 3, 5 iters)",
+    "scope_excluded": [
+      "enc_768 chain (would require propagating perm into latent → decoder/gimbal/prior_net; deferred)",
+      "decoder chain (mirrors encoder; would also require it)",
+      "gimbal, prior_net, latent_pca (latent-space rotations tied to encoder output)"
+    ],
+    "verification": "Random-perm test: applying random valid perms to all encoder classes preserves pure-B function (rms within ±0.03 of fresh load baseline). Confirms the topology + tied-group semantics are correct for encoder.",
+    "morph_outcome": "Does NOT prevent collapse at intermediate t. Side-by-side rms comparison at 9 t values shows naive and full-rebasin produce essentially identical output (within stateful-cache jitter):",
+    "morph_comparison_rms": [
+      {"t": 0.000, "naive": 0.3952, "full": 0.4077},
+      {"t": 0.005, "naive": 0.2954, "full": 0.2943},
+      {"t": 0.050, "naive": 0.0410, "full": 0.0428},
+      {"t": 0.100, "naive": 0.0083, "full": 0.0095},
+      {"t": 0.250, "naive": 0.0005, "full": 0.0005},
+      {"t": 0.500, "naive": 0.0005, "full": 0.0005},
+      {"t": 0.750, "naive": 0.0007, "full": 0.0007},
+      {"t": 0.950, "naive": 0.0497, "full": 0.0468},
+      {"t": 1.000, "naive": 0.2971, "full": 0.3259}
+    ],
+    "diagnosis": "Encoder alignment alone is insufficient. The latent OUTPUT of encoder.net.16 is NOT permuted (intentionally, to preserve latent space for downstream consumers). Therefore the decoder receives the same latent it would receive naively, and the COLLAPSE is downstream — driven by the decoder weights being naively averaged across two independently-trained instruments. To prevent collapse, full Re-Basin must also cover the decoder + gimbal + prior_net, propagating a consistent latent-space permutation through all of them.",
+    "next_step_if_pursued": "Mirror encoder topology in decoder (dec_48/96/192/384/768 chain + dec_inner_X classes including the doubled .net.0 + .net.1 resblock pairs), introduce a 128-d latent perm class that connects encoder.net.16 output rows (mean half), decoder.net.0 input, gimbal.log_a/b, latent_pca rows+cols, latent_mean, last_z buffer, prior_net.net.0/4 input/output."
+  },
+  "rebasin_runs_guitar_organ_inner_only": [
+    {"name": "rb_t00",       "mode": "linear", "t": 0.00, "rms": 0.4049},
+    {"name": "rb_t025",      "mode": "linear", "t": 0.25, "rms": 0.0006, "note": "COLLAPSE (rebasin did not help)"},
+    {"name": "rb_t05",       "mode": "linear", "t": 0.50, "rms": 0.0005, "note": "COLLAPSE"},
+    {"name": "rb_t075",      "mode": "linear", "t": 0.75, "rms": 0.0008, "note": "COLLAPSE"},
+    {"name": "rb_t10",       "mode": "linear", "t": 1.00, "rms": 0.3382}
+  ],
+  "real_runs_guitar_organ": [
+    {"name": "gtr_t00",       "mode": "linear", "t": 0.00, "rms": 0.3979, "dist_guitar": 0.0000, "dist_organ": 0.4574, "note": "pure guitar"},
+    {"name": "gtr_t025",      "mode": "linear", "t": 0.25, "rms": 0.0005, "dist_guitar": 0.3978, "dist_organ": 0.3387, "note": "COLLAPSE"},
+    {"name": "gtr_t05",       "mode": "linear", "t": 0.50, "rms": 0.0005, "dist_guitar": 0.3979, "dist_organ": 0.3388, "note": "COLLAPSE"},
+    {"name": "gtr_t075",      "mode": "linear", "t": 0.75, "rms": 0.0007, "dist_guitar": 0.3978, "dist_organ": 0.3387, "note": "COLLAPSE"},
+    {"name": "gtr_t10",       "mode": "linear", "t": 1.00, "rms": 0.3388, "dist_guitar": 0.4574, "dist_organ": 0.0000, "note": "pure organ"},
+    {"name": "gtr_slerp_t05", "mode": "slerp",  "t": 0.50, "rms": 0.0012, "dist_guitar": 0.3979, "dist_organ": 0.3387, "note": "COLLAPSE"}
+  ],
+  "observations": [
+    "Stub pair (architecturally identical random conv weights): linear monotonic, slerp symmetric, walk drifts — pipeline mechanics verified",
+    "Real pair (guitar+organ, both b2048_r48000_z16 — same architecture, different training corpus): intermediate t collapses to near-silence (rms ~0.0005)",
+    "This is a known failure mode of naive weight-space interpolation between independently-trained nets — they do not lie on a low-loss connectivity curve",
+    "Failure mode is itself a sound-art finding: a 'hollowed-out' model that hears nothing but emits a faint ghost-residue. Worth surfacing as an intentional preset",
+    "Future: try Git Re-Basin / permutation alignment before interp; train two RAVE models from a shared initialization; or limit morph to small t windows near each endpoint"
+  ],
+  "open_questions": [
+    "Does t in [0, 0.05] near each endpoint produce gradual drift, or is the collapse cliff sharp?",
+    "Pre-align weights via activation matching (Git Re-Basin) — does interp then preserve audio?",
+    "Train two RAVE checkpoints sharing init — should morph cleanly between them",
+    "Combine MVP-D collapse-mode output as input to MVP-A latent perturb — chaining failure modes"
+  ]
+}

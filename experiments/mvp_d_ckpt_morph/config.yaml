@@ -1,0 +1,47 @@
+checkpoints:
+  paths:
+    - checkpoints/rave/guitar_iil_b2048_r48000_z16.ts
+    - checkpoints/rave/organ_archive_b2048_r48000_z16.ts
+device: "cuda:1"
+rebasin: true
+rebasin_mode: partial
+
+morph:
+  mode: linear
+  t: 0.005
+  walk_step: 0.05
+
+perturb:
+  noise_scale: 0.05
+  noise_mode: smoothed
+  noise_smooth: 0.98
+  dim_dropout: 0.10
+  dim_shuffle: false
+  bias_vector: null
+  freeze_mask: null
+
+render:
+  chunk_seconds: 4.0
+  overlap_seconds: 0.05
+
+mix:
+  dry_wet: 0.15
+  rms_match: true
+  limiter: true
+  limiter_drive: 1.0
+
+governor:
+  enabled: true
+  min_wet: 0.05
+  flatness_max: 0.55
+  rms_min: 0.0001
+  rms_max: 0.85
+  centroid_max_ratio: 0.42
+
+osc:
+  listen_host: 127.0.0.1
+  listen_port: 5009
+  target_host: 127.0.0.1
+  target_port: 5010
+
+seed: 42

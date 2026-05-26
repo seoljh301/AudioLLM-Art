@@ -1,0 +1,38 @@
+# MVP-B: caption -> text-to-audio recursive loop
+name: mvp_b_caption_loop
+seed: 0
+sample_rate: 16000          # Qwen2-Audio expects 16k; AudioLDM2 outputs 16k by default
+
+caption:
+  backend: stub             # stub | qwen2_audio
+  model: Qwen/Qwen2-Audio-7B-Instruct
+  prompt: "Describe the sound in one short sentence."
+  max_new_tokens: 48
+  device: "cuda:1"
+
+tta:
+  backend: stub             # stub | audioldm2
+  model: cvssp/audioldm2
+  duration_s: 6.0
+  guidance_scale: 3.5
+  num_inference_steps: 50
+  device: "cuda:1"
+
+loop:
+  depth: 6
+  text_mutation_prob: 0.3
+  mutation_pool:
+    - fragmented
+    - decayed
+    - whispered
+    - underwater
+    - metallic
+    - haunted
+    - smeared
+    - impossible
+
+osc:
+  listen_host: 127.0.0.1
+  listen_port: 7410
+  send_host: 127.0.0.1
+  send_port: 7411

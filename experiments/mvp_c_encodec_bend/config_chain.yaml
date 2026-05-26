@@ -1,0 +1,20 @@
+codec:
+  name: encodec_24khz
+  device: "cuda:1"
+  bandwidth: 6.0
+bend:
+  mode: shuffle
+  rate: 0.10
+  auto_upper_fraction: 0.5
+  shuffle_window: 12
+  codebook_size: 1024        # ADDED MISSING KEY
+render:
+  chunk_seconds: 4.0
+mix:
+  dry_wet: 0.70
+  rms_match: true
+  limiter: true
+  low_anchor_hz: 150.0
+governor:
+  enabled: true
+  min_wet: 0.15

@@ -1,0 +1,80 @@
+{
+  "status": "wired with real RAVE on V100",
+  "model": "checkpoints/rave/guitar_iil_b2048_r48000_z16.ts (IRCAM IIL guitar, ~156 MB)",
+  "stub_model": "checkpoints/rave/stub.ts (untrained, for pipeline verification only)",
+  "sample_rate": 48000,
+  "latent_dim": 16,
+  "device": "cuda (V100, torch 2.4.1+cu121)",
+  "input_signal": "runs/mvp_a/sine_test_in_48k.wav",
+  "input_description": "5s synthetic: 220+440+880Hz tones + AM + light noise, 48kHz mono",
+  "input_top_freq_bins": [440, 880, 1754, 1766, 25531],
+  "runs": [
+    {
+      "preset": "noise01",
+      "perturb": {"noise_scale": 0.1, "dim_dropout": 0.0, "dim_shuffle": false},
+      "output": "runs/mvp_a/sine_test_out_noise01.wav",
+      "delta_rms": 0.099,
+      "out_rms": 0.0082,
+      "diff_rms": 0.3583,
+      "top_freq_bins_out": [10698, 15393, 22388, 27927, 33130]
+    },
+    {
+      "preset": "noise05",
+      "perturb": {"noise_scale": 0.5, "dim_dropout": 0.0, "dim_shuffle": false},
+      "output": "runs/mvp_a/sine_test_out_noise05.wav",
+      "delta_rms": 0.497,
+      "out_rms": 0.0228,
+      "diff_rms": 0.3589,
+      "top_freq_bins_out": [10698, 15393, 16976, 44985, 47610]
+    },
+    {
+      "preset": "noise20",
+      "perturb": {"noise_scale": 2.0, "dim_dropout": 0.0, "dim_shuffle": false},
+      "output": "runs/mvp_a/sine_test_out_noise20.wav",
+      "delta_rms": 1.986,
+      "out_rms": 0.0866,
+      "diff_rms": 0.3683,
+      "top_freq_bins_out": [10672, 16976, 35687, 44985, 47610]
+    },
+    {
+      "preset": "drop03",
+      "perturb": {"noise_scale": 0.0, "dim_dropout": 0.3, "dim_shuffle": false},
+      "output": "runs/mvp_a/sine_test_out_drop03.wav",
+      "delta_rms": 0.065,
+      "out_rms": 0.0057,
+      "diff_rms": 0.3582,
+      "top_freq_bins_out": [10698, 32120, 33339, 34677, 37021]
+    },
+    {
+      "preset": "shuffle",
+      "perturb": {"noise_scale": 0.0, "dim_dropout": 0.0, "dim_shuffle": true},
+      "output": "runs/mvp_a/sine_test_out_shuffle.wav",
+      "delta_rms": 0.157,
+      "out_rms": 0.0070,
+      "diff_rms": 0.3584,
+      "top_freq_bins_out": [2560, 5138, 17362, 24638, 41935]
+    }
+  ],
+  "observations": [
+    "Stub: out_rms scales with noise_scale (0.008 -> 0.023 -> 0.087) — wiring verified",
+    "Stub cannot preserve input spectrum (random conv); meaningful sonic output requires trained model"
+  ],
+  "real_runs_guitar": [
+    {"preset": "clean",   "perturb": {"noise_scale": 0.0},                       "output": "runs/mvp_a/guitar_clean.wav",   "delta_rms": 0.000},
+    {"preset": "noise01", "perturb": {"noise_scale": 0.1},                       "output": "runs/mvp_a/guitar_noise01.wav", "delta_rms": 0.099},
+    {"preset": "noise03", "perturb": {"noise_scale": 0.3},                       "output": "runs/mvp_a/guitar_noise03.wav", "delta_rms": 0.299},
+    {"preset": "noise10", "perturb": {"noise_scale": 1.0},                       "output": "runs/mvp_a/guitar_noise10.wav", "delta_rms": 0.996},
+    {"preset": "drop02",  "perturb": {"dim_dropout": 0.2},                       "output": "runs/mvp_a/guitar_drop02.wav",  "delta_rms": 0.651},
+    {"preset": "shuffle", "perturb": {"dim_shuffle": true},                      "output": "runs/mvp_a/guitar_shuffle.wav", "delta_rms": 12.876}
+  ],
+  "real_observations": [
+    "delta_rms (perturbation magnitude in latent space) tracks the configured noise/dropout level",
+    "shuffle on a trained RAVE produces enormous delta (12.88) — different latent dims occupy different value ranges, so permutation is highly destructive",
+    "GPU render: 5 s of audio in ~1.5-2 s wall time on V100 (~3x realtime); EnCodec on CPU was ~50x slower"
+  ],
+  "open_questions": [
+    "Listen tests: which preset is most musically useful for the guitar checkpoint? Try voice_hifitts and other corpora",
+    "Sweep freeze_mask: pin first N dims, perturb only tail — likely most musical control",
+    "Chain MVP-A noise output through MVP-C encoder for double-distortion"
+  ]
+}

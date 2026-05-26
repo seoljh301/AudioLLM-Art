@@ -1,0 +1,20 @@
+model:
+  path: checkpoints/rave/guitar_iil_b2048_r48000_z16.ts
+  device: "cuda:1"
+
+freeze:
+  auto_upper_fraction: 0.5    # Freeze top 50% of spectral details
+  freeze_active: true
+
+render:
+  chunk_seconds: 4.0
+
+mix:
+  dry_wet: 0.5
+  low_anchor_hz: 150.0
+
+governor:
+  enabled: true
+  flatness_max: 0.60
+
+seed: 42

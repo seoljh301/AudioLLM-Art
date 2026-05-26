@@ -1,0 +1,9 @@
+mix:
+  dry_wet: 0.60
+  rms_match: true
+  limiter: true
+  low_anchor_hz: 80.0         # Targeted Subwoofer Band
+  sub_boost_db: 3.0           # 3dB supplemental boost for the anchor
+governor:
+  enabled: true
+  min_wet: 0.15

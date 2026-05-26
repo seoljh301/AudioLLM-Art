@@ -1,0 +1,38 @@
+model:
+  path: checkpoints/rave/guitar_iil_b2048_r48000_z16.ts
+  device: "cuda:1"
+
+perturb:
+  noise_scale: 0.08
+  noise_mode: smoothed
+  noise_smooth: 0.98
+  dim_dropout: 0.05
+  dim_shuffle: false
+  bias_vector: null
+  freeze_mask: null
+
+render:
+  chunk_seconds: 4.0
+  overlap_seconds: 0.05
+
+mix:
+  dry_wet: 0.35
+  rms_match: true
+  limiter: true
+  limiter_drive: 1.0
+
+governor:
+  enabled: true
+  min_wet: 0.10
+  flatness_max: 0.55
+  rms_min: 0.0001
+  rms_max: 0.85
+  centroid_max_ratio: 0.42
+
+osc:
+  listen_host: 127.0.0.1
+  listen_port: 5005
+  target_host: 127.0.0.1
+  target_port: 5006
+
+seed: 42

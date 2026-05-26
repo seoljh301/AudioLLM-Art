@@ -1,0 +1,30 @@
+name: audioart
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      # Torch + audio (cu121 wheels — V100 SM 7.0 supported; torch 2.12+cu130 requires SM>=7.5)
+      - --extra-index-url https://download.pytorch.org/whl/cu121
+      - torch==2.4.1
+      - torchaudio==2.4.1
+      # Numerics
+      - numpy
+      - scipy
+      - pyyaml
+      # Audio I/O + analysis
+      - soundfile
+      - sounddevice
+      - librosa
+      # OSC bridge
+      - python-osc
+      # Codecs
+      - encodec
+      - descript-audio-codec
+      # Foundation models
+      - transformers>=4.40
+      - diffusers
+      - accelerate
+      # Logging
+      - tensorboard

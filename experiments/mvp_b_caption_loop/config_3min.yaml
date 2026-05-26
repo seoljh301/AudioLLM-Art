@@ -1,0 +1,21 @@
+sample_rate: 16000
+
+loop:
+  depth: 10
+  text_mutation_prob: 0.3
+  mutation_pool:
+    - "with heavy neural interference"
+    - "becoming a hollow metallic ghost"
+    - "shimmering with digital grit"
+    - "underwater and distorted"
+    - "as if heard through a distant dream"
+
+caption:
+  backend: stub
+  prompt: "Describe the sound in one short sentence."
+
+tta:
+  backend: stub
+  duration_s: 18.0   # 18s x 10 depth = 180s total
+
+seed: 42

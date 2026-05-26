@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pt
+*.pth
+*.ckpt
+*.ts
+*.onnx
+data/
+checkpoints/
+runs/
+.venv/
+.idea/
+.vscode/
+.DS_Store

@@ -1,0 +1,60 @@
+{
+  "status": "wired",
+  "codec": "encodec_24khz",
+  "bandwidth_kbps": 6.0,
+  "n_quantizers": 32,
+  "codebook_size": 1024,
+  "device": "cuda (V100, torch 2.4.1+cu121) — earlier runs on cpu kept for parity",
+  "input_signal": "runs/mvp_c/sine_test_in.wav",
+  "input_description": "5s synthetic: 220+440+880Hz tones + AM + light noise, 24kHz mono",
+  "runs": [
+    {
+      "id": "bit_flip_r0.1",
+      "date": "2026-05-22",
+      "bend": {"mode": "bit_flip", "rate": 0.1},
+      "output": "runs/mvp_c/sine_test_out_bit_flip.wav",
+      "metrics": {"diff_rms": 0.1370, "out_rms": 0.3394, "token_diffs": 480, "wall_time_s": 295},
+      "top_freq_bins_out": [436, 440, 880, 1754, 1766],
+      "notes": "Bit flip introduces 4 Hz sideband near 440 Hz; main partials preserved."
+    },
+    {
+      "id": "quantizer_drop_r0.1",
+      "date": "2026-05-22",
+      "bend": {"mode": "quantizer_drop", "rate": 0.1},
+      "output": "runs/mvp_c/sine_test_out_quantizer_drop.wav",
+      "metrics": {"diff_rms": 0.0958, "out_rms": 0.3491, "token_diffs": 600, "wall_time_s": 286},
+      "top_freq_bins_out": [440, 880, 900, 1754, 1766],
+      "notes": "Lowest diff_rms; extra partial at 900 Hz from dropped quantizer rows."
+    },
+    {
+      "id": "shuffle_r0.1",
+      "date": "2026-05-22",
+      "bend": {"mode": "shuffle", "rate": 0.1},
+      "output": "runs/mvp_c/sine_test_out_shuffle.wav",
+      "metrics": {"diff_rms": 0.1567, "out_rms": 0.3413, "token_diffs": 310, "wall_time_s": 277},
+      "top_freq_bins_out": [440, 878, 880, 1754, 1766],
+      "notes": "Highest diff_rms; temporal scramble produces micro-stutter."
+    },
+    {
+      "id": "invalid_token_r0.1",
+      "date": "2026-05-22",
+      "bend": {"mode": "invalid_token", "rate": 0.1},
+      "output": "runs/mvp_c/sine_test_out_invalid_token.wav",
+      "metrics": {"diff_rms": 0.1355, "out_rms": 0.3360, "token_diffs": 480, "wall_time_s": 268},
+      "top_freq_bins_out": [150, 440, 880, 1754, 1766],
+      "notes": "Low-freq artifact at 150 Hz from clamped -1 tokens hitting codebook[0]."
+    }
+  ],
+  "gpu_render_smoke": {
+    "device": "cuda V100",
+    "bend": {"mode": "bit_flip", "rate": 0.05},
+    "output": "runs/mvp_c/sine_test_out_gpu_bit_flip.wav",
+    "wall_time_s": 1.6,
+    "speedup_vs_cpu": "~170x"
+  },
+  "open_questions": [
+    "Sweep upper vs lower quantizer_range to isolate timbre vs structure damage",
+    "Try non-sine input (vocal, percussion, field recording) to characterize bend per material",
+    "Compare DAC 44.1kHz against EnCodec 24kHz at matched rate — different codebook geometries"
+  ]
+}

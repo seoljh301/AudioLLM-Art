@@ -1,0 +1,31 @@
+codec:
+  name: encodec_24khz
+  device: "cuda:1"
+  bandwidth: 6.0
+
+bend:
+  mode: shuffle
+  rate: 0.12                  # Increased (was 0.03)
+  auto_upper_fraction: 0.5    # More quantizers affected
+  shuffle_window: 8           # Smaller window = more granular stutter
+  codebook_size: 1024
+
+render:
+  chunk_seconds: 4.0
+  overlap_seconds: 0.05
+
+mix:
+  dry_wet: 0.80               # High Wet (was 0.40)
+  rms_match: true
+  limiter: true
+  limiter_drive: 1.1
+
+governor:
+  enabled: true
+  min_wet: 0.15
+  flatness_max: 0.60
+  rms_min: 0.0001
+  rms_max: 0.90
+  centroid_max_ratio: 0.45
+
+seed: 1234
