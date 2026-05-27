@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AudioArt — Demo Page</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --fg: #c9d1d9;
+    --muted: #8b949e;
+    --accent: #7fffd4;
+    --card: #161b22;
+    --border: #30363d;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 14px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+          Roboto, "Helvetica Neue", Arial, "Noto Sans KR", sans-serif;
+  }
+  header {
+    padding: 40px 32px 24px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #0d1117 0%, #161b22 100%);
+  }
+  header h1 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+  }
+  header h1 .accent { color: var(--accent); }
+  header p.tagline {
+    color: var(--muted);
+    margin: 0;
+    max-width: 720px;
+  }
+  nav {
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+    position: sticky; top: 0; z-index: 10;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  nav a {
+    color: var(--accent);
+    text-decoration: none;
+    padding: 6px 12px;
+    margin-right: 4px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 13px;
+  }
+  nav a:hover { background: #1f2530; }
+  main { padding: 24px 32px 80px; max-width: 1200px; margin: 0 auto; }
+  .section { margin-top: 48px; scroll-margin-top: 72px; }
+  .section h2 {
+    margin: 0 0 4px;
+    font-size: 22px;
+    border-left: 4px solid var(--accent);
+    padding-left: 12px;
+  }
+  .section .blurb { color: var(--muted); margin: 0 0 20px 16px; max-width: 760px; }
+  .tracks { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); }
+  .track {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .track.missing { opacity: 0.4; }
+  .track .title { font-weight: 600; font-size: 15px; }
+  .track .desc { color: var(--muted); font-size: 13px; }
+  .track .wave {
+    display: block;
+    width: 100%;
+    height: 60px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: #0d1117;
+    image-rendering: -webkit-optimize-contrast;
+  }
+  audio { width: 100%; }
+  .meta { color: var(--muted); font-size: 12px; font-family: ui-monospace, Menlo, monospace; }
+  .meta a { color: var(--accent); text-decoration: none; margin-left: 4px; }
+  footer {
+    padding: 32px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+  code { background: #1f2530; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Audio<span class="accent">Art</span> — Demo</h1>
+  <p class="tagline">
+    Aesthetic misuse of audio foundation models. 9 MVP modules (A–I) wired into
+    5 macro-nets and 1 meta-symphony. Every track is rendered from a sine wave
+    seed through some chain of latent perturbation, codec bending, checkpoint
+    morphing, granular memory, freeze shimmer, feedback echo, generative drone,
+    and bass massive operations.
+  </p>
+</header>
+<nav>
+  <a href="#seeds">seeds</a>
+  <a href="#net1">Net 1</a>
+  <a href="#net2">Net 2</a>
+  <a href="#net3">Net 3</a>
+  <a href="#max_p1">Net Max p1</a>
+  <a href="#max_p2">Net Max p2</a>
+  <a href="#dyn">Net Dynamic</a>
+  <a href="#meta">Meta-Symphony</a>
+  <a href="#archive">Archive</a>
+</nav>
+<main>
+
+<section class="section" id="seeds">
+  <h2>Seeds</h2>
+  <p class="blurb">Synthetic inputs fed to the macro-nets. The whole pipeline starts here.</p>
+  <div class="tracks">
+<div class="track">
+  <div class="title">Sine 440 Hz · 10 s</div>
+  <div class="desc">Clean 440 Hz seed used by Net 1 / 2 / 3.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_sine_440_10s_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/sine_440_10s.wav"></audio>
+  <div class="meta">10.0s · 48 kHz · mono · rms 0.495 · peak 0.700 · 0.9 MB · <a href="runs/multinet/sine_440_10s.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Sine enriched · 30 s</div>
+  <div class="desc">440 Hz fundamental + 660 Hz 5th + 0.13 Hz tremolo + slow drift. Seed for Net Max.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_sine_max_30s_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/sine_max_30s.wav"></audio>
+  <div class="meta">30.0s · 48 kHz · mono · rms 0.315 · peak 0.742 · 2.7 MB · <a href="runs/multinet/sine_max_30s.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Sine dynamic arc · 60 s</div>
+  <div class="desc">Pitch sweep 220→660 Hz + amplitude arc + sparse onsets + 30 s gaussian dip. Seed for Net Dynamic.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_sine_dyn_60s_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/sine_dyn_60s.wav"></audio>
+  <div class="meta">60.0s · 48 kHz · mono · rms 0.387 · peak 0.850 · 5.5 MB · <a href="runs/multinet/sine_dyn_60s.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Sub-bass · 180 s</div>
+  <div class="desc">32.7 + 41.2 + 55 Hz triple-sub with FM + 30 s breathing LFO. Seed for Meta-Symphony.</div>
+  <img class="wave" src="runs/_thumbs/runs_masterpiece_meta_symphony_seed_sub_180s_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/masterpiece/meta_symphony/seed_sub_180s.wav"></audio>
+  <div class="meta">180.0s · 48 kHz · mono · rms 0.218 · peak 0.800 · 16.5 MB · <a href="runs/masterpiece/meta_symphony/seed_sub_180s.wav">download</a></div>
+</div></div>
+</section>
+
+<section class="section" id="net1">
+  <h2>Net 1 — Crystal Cathedral</h2>
+  <p class="blurb">5 buses in parallel (L bass · M core · H shimmer · T recursive · D drone) summed through an 80 Hz anchor and a soft limiter. 10 s sine seed.</p>
+  <div class="tracks">
+<div class="track">
+  <div class="title">MASTER — Crystal Cathedral</div>
+  <div class="desc">5-bus parallel mix with 80 Hz anchor. 440 Hz still recognisable; drone bed at 49/76/82 Hz fills sub-bass.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net1_MASTER_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net1/MASTER.wav"></audio>
+  <div class="meta">180.0s · 48 kHz · mono · rms 0.268 · peak 0.950 · 16.5 MB · <a href="runs/multinet/net1/MASTER.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Bus L — Bass Massive (I)</div>
+  <div class="desc">EnCodec lower-RVQ temporal smear, 80 Hz sub-anchored.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net1_bus_L_bass_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net1/bus_L_bass.wav"></audio>
+  <div class="meta">180.0s · 48 kHz · mono · rms 0.209 · peak 0.951 · 16.5 MB · <a href="runs/multinet/net1/bus_L_bass.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Bus M — Core (A→D→C)</div>
+  <div class="desc">RAVE latent noise + checkpoint morph + token bit-flip.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net1_bus_M_core_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net1/bus_M_core.wav"></audio>
+  <div class="meta">180.0s · 48 kHz · mono · rms 0.273 · peak 0.896 · 16.5 MB · <a href="runs/multinet/net1/bus_M_core.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Bus H — Shimmer (F→A)</div>
+  <div class="desc">Upper-50% latent freeze + high-noise pass.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net1_bus_H_shimmer_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net1/bus_H_shimmer.wav"></audio>
+  <div class="meta">176.4s · 48 kHz · mono · rms 0.181 · peak 1.000 · 16.1 MB · <a href="runs/multinet/net1/bus_H_shimmer.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Bus T — Recursive (G→E)</div>
+  <div class="desc">Latent feedback echo + granular memory projection.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net1_bus_T_recursive_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net1/bus_T_recursive.wav"></audio>
+  <div class="meta">176.4s · 48 kHz · mono · rms 0.223 · peak 0.872 · 16.1 MB · <a href="runs/multinet/net1/bus_T_recursive.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Bus D — Drone (H prime)</div>
+  <div class="desc">Generative codebook organ on prime-index tokens.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net1_bus_D_drone_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net1/bus_D_drone.wav"></audio>
+  <div class="meta">180.0s · 48 kHz · mono · rms 0.213 · peak 0.900 · 16.5 MB · <a href="runs/multinet/net1/bus_D_drone.wav">download</a></div>
+</div></div>
+</section>
+
+<section class="section" id="net2">
+  <h2>Net 2 — Recursive Organ</h2>
+  <p class="blurb">G→A→C→F chain wrapped in a 3-pass macro-feedback. Each pass eats its own tail; listen for the pitch drift across passes.</p>
+  <div class="tracks">
+<div class="track">
+  <div class="title">MASTER — Recursive Organ</div>
+  <div class="desc">After 3 macro-feedback passes through G→A→C→F. Pitch drifts from 440 to ≈600 Hz.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net2_MASTER_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net2/MASTER.wav"></audio>
+  <div class="meta">178.6s · 48 kHz · mono · rms 0.251 · peak 0.950 · 16.3 MB · <a href="runs/multinet/net2/MASTER.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Pass 0</div>
+  <div class="desc">First pass on raw sine. Holds 440 Hz core.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net2_pass_0_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net2/pass_0.wav"></audio>
+  <div class="meta">178.6s · 48 kHz · mono · rms 0.218 · peak 1.000 · 16.3 MB · <a href="runs/multinet/net2/pass_0.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Pass 1</div>
+  <div class="desc">Pass-0 re-fed. Pitch slides to ~400 Hz.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net2_pass_1_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net2/pass_1.wav"></audio>
+  <div class="meta">178.6s · 48 kHz · mono · rms 0.228 · peak 1.000 · 16.3 MB · <a href="runs/multinet/net2/pass_1.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Pass 2</div>
+  <div class="desc">Pass-1 re-fed. Pitch jumps to ~600 Hz — model loses anchor.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net2_pass_2_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net2/pass_2.wav"></audio>
+  <div class="meta">10.0s · 48 kHz · mono · rms 0.047 · peak 1.000 · 0.9 MB · <a href="runs/multinet/net2/pass_2.wav">download</a></div>
+</div></div>
+</section>
+
+<section class="section" id="net3">
+  <h2>Net 3 — Decoding Chamber</h2>
+  <p class="blurb">Linear 9-stage pipeline + a dry 80 Hz bypass that brings the sub back. Per-stage outputs show the sound dissolving.</p>
+  <div class="tracks">
+<div class="track">
+  <div class="title">MASTER — Decoding Chamber</div>
+  <div class="desc">Linear 9-stage A→D→E→F→G→C→I + dry 80 Hz crossover anchor. Sub-bass single-handedly restores RMS after 7-stage decay.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net3_MASTER_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net3/MASTER.wav"></audio>
+  <div class="meta">180.0s · 48 kHz · mono · rms 0.466 · peak 0.950 · 16.5 MB · <a href="runs/multinet/net3/MASTER.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Stage 1 — A noise=0.03</div>
+  <div class="desc">Light smoothed latent noise.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net3_s1_A_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net3/s1_A.wav"></audio>
+  <div class="meta">176.4s · 48 kHz · mono · rms 0.223 · peak 0.810 · 16.1 MB · <a href="runs/multinet/net3/s1_A.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Stage 2 — D morph t=0.005</div>
+  <div class="desc">Endpoint-cliff morph (just past pure-guitar).</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net3_s2_D_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net3/s2_D.wav"></audio>
+  <div class="meta">176.4s · 48 kHz · mono · rms 0.231 · peak 0.839 · 16.1 MB · <a href="runs/multinet/net3/s2_D.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Stage 3 — E granular</div>
+  <div class="desc">Memory buffer 1024 frames, 4 grains.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net3_s3_E_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net3/s3_E.wav"></audio>
+  <div class="meta">176.4s · 48 kHz · mono · rms 0.241 · peak 0.954 · 16.1 MB · <a href="runs/multinet/net3/s3_E.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Stage 4 — F freeze 25%</div>
+  <div class="desc">Upper-quarter latent dim shimmer.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net3_s4_F_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net3/s4_F.wav"></audio>
+  <div class="meta">176.4s · 48 kHz · mono · rms 0.226 · peak 1.000 · 16.1 MB · <a href="runs/multinet/net3/s4_F.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Stage 5 — G feedback d=24</div>
+  <div class="desc">Latent echo, light feedback.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net3_s5_G_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net3/s5_G.wav"></audio>
+  <div class="meta">176.4s · 48 kHz · mono · rms 0.229 · peak 1.000 · 16.1 MB · <a href="runs/multinet/net3/s5_G.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Stage 6 — C bit-flip upper</div>
+  <div class="desc">Upper-3-quantizer bit-flips.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net3_s6_C_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net3/s6_C.wav"></audio>
+  <div class="meta">180.0s · 48 kHz · mono · rms 0.283 · peak 1.000 · 16.5 MB · <a href="runs/multinet/net3/s6_C.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Stage 7 — I bass smear</div>
+  <div class="desc">Lower-q temporal smear pre-anchor.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net3_s7_I_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net3/s7_I.wav"></audio>
+  <div class="meta">180.0s · 48 kHz · mono · rms 0.249 · peak 1.000 · 16.5 MB · <a href="runs/multinet/net3/s7_I.wav">download</a></div>
+</div></div>
+</section>
+
+<section class="section" id="max_p1">
+  <h2>Net Max — Cathedral Hive · Pass 1</h2>
+  <p class="blurb">8 buses (α–θ) feeding one master mix. Bus θ taps β to create cross-bus feedback.</p>
+  <div class="tracks">
+<div class="track">
+  <div class="title">MASTER pass 1</div>
+  <div class="desc">8-bus parallel mix, pass 1 weights.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_max_MASTER_pass1_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_max/MASTER_pass1.wav"></audio>
+  <div class="meta">30.0s · 48 kHz · mono · rms 0.226 · peak 0.950 · 2.7 MB · <a href="runs/multinet/net_max/MASTER_pass1.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">α Foundation</div>
+  <div class="desc">I + C(invalid_token) + 80 Hz anchor +10 dB.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_max_p1_bus_α_foundation_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_max/p1_bus_α_foundation.wav"></audio>
+  <div class="meta">30.0s · 48 kHz · mono · rms 0.371 · peak 1.000 · 2.7 MB · <a href="runs/multinet/net_max/p1_bus_α_foundation.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">β Core</div>
+  <div class="desc">6-stage chain A→D(guitar)→E→G→A(drop)→F.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_max_p1_bus_β_core_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_max/p1_bus_β_core.wav"></audio>
+  <div class="meta">30.0s · 48 kHz · mono · rms 0.017 · peak 0.295 · 2.7 MB · <a href="runs/multinet/net_max/p1_bus_β_core.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">γ Ghost</div>
+  <div class="desc">Nested F→G→C(shuffle)→F freeze chain.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_max_p1_bus_γ_ghost_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_max/p1_bus_γ_ghost.wav"></audio>
+  <div class="meta">30.0s · 48 kHz · mono · rms 0.181 · peak 1.000 · 2.7 MB · <a href="runs/multinet/net_max/p1_bus_γ_ghost.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">δ Twin</div>
+  <div class="desc">Organ-side morph + heavy perturb + token bend.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_max_p1_bus_δ_twin_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_max/p1_bus_δ_twin.wav"></audio>
+  <div class="meta">30.0s · 48 kHz · mono · rms 0.104 · peak 0.847 · 2.7 MB · <a href="runs/multinet/net_max/p1_bus_δ_twin.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">ε Glitch</div>
+  <div class="desc">Aggressive C(rate=0.10) + I(fold) + G.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_max_p1_bus_ε_glitch_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_max/p1_bus_ε_glitch.wav"></audio>
+  <div class="meta">30.0s · 48 kHz · mono · rms 0.132 · peak 0.670 · 2.7 MB · <a href="runs/multinet/net_max/p1_bus_ε_glitch.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">ζ Drone</div>
+  <div class="desc">H(prime) + H(fibonacci) → A smoothing.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_max_p1_bus_ζ_drone_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_max/p1_bus_ζ_drone.wav"></audio>
+  <div class="meta">30.0s · 48 kHz · mono · rms 0.127 · peak 0.763 · 2.7 MB · <a href="runs/multinet/net_max/p1_bus_ζ_drone.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">η Loop-B</div>
+  <div class="desc">Caption→TTA depth 3, stub backend.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_max_p1_bus_η_loopB_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_max/p1_bus_η_loopB.wav"></audio>
+  <div class="meta">30.0s · 48 kHz · mono · rms 0.334 · peak 0.880 · 2.7 MB · <a href="runs/multinet/net_max/p1_bus_η_loopB.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">θ XFB</div>
+  <div class="desc">Cross-bus feedback: β output → G(deep) → I(fold).</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_max_p1_bus_θ_xfb_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_max/p1_bus_θ_xfb.wav"></audio>
+  <div class="meta">30.0s · 48 kHz · mono · rms 0.015 · peak 0.321 · 2.7 MB · <a href="runs/multinet/net_max/p1_bus_θ_xfb.wav">download</a></div>
+</div></div>
+</section>
+
+<section class="section" id="max_p2">
+  <h2>Net Max — Cathedral Hive · Pass 2 & Final</h2>
+  <p class="blurb">Pass 1's master + the seed are RMS-matched and refed. β/θ weights are bumped. Final = S-curve crossfade between pass 1 and pass 2.</p>
+  <div class="tracks">
+<div class="track">
+  <div class="title">MASTER pass 2</div>
+  <div class="desc">Same 8 buses, refed-seed input, β/θ weights bumped.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_max_MASTER_pass2_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_max/MASTER_pass2.wav"></audio>
+  <div class="meta">30.0s · 48 kHz · mono · rms 0.208 · peak 0.950 · 2.7 MB · <a href="runs/multinet/net_max/MASTER_pass2.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Refed seed (0.55·M1 + 0.45·sine)</div>
+  <div class="desc">Input to pass 2.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_max_p2_refed_seed_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_max/p2_refed_seed.wav"></audio>
+  <div class="meta">30.0s · 48 kHz · mono · rms 0.314 · peak 1.000 · 2.7 MB · <a href="runs/multinet/net_max/p2_refed_seed.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">β Core (pass 2)</div>
+  <div class="desc">Deepened chain on refed seed.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_max_p2_bus_β_core_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_max/p2_bus_β_core.wav"></audio>
+  <div class="meta">30.0s · 48 kHz · mono · rms 0.077 · peak 0.832 · 2.7 MB · <a href="runs/multinet/net_max/p2_bus_β_core.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">θ XFB (pass 2)</div>
+  <div class="desc">Reinforced cross-bus feedback.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_max_p2_bus_θ_xfb_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_max/p2_bus_θ_xfb.wav"></audio>
+  <div class="meta">30.0s · 48 kHz · mono · rms 0.072 · peak 0.664 · 2.7 MB · <a href="runs/multinet/net_max/p2_bus_θ_xfb.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">MASTER FINAL — Cathedral Hive</div>
+  <div class="desc">Time-varying S-curve blend of pass 1 → pass 2 across the 30 s. Six independent pitch zones present simultaneously.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_max_MASTER_FINAL_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_max/MASTER_FINAL.wav"></audio>
+  <div class="meta">30.0s · 48 kHz · mono · rms 0.260 · peak 0.950 · 2.7 MB · <a href="runs/multinet/net_max/MASTER_FINAL.wav">download</a></div>
+</div></div>
+</section>
+
+<section class="section" id="dyn">
+  <h2>Net Dynamic — Tempest</h2>
+  <p class="blurb">Same 8 buses as Net Max but post-render time-varies each bus's amplitude, stamps three impulse events, and sweeps a master lowpass cutoff. 22 dB dynamic range across the 60 s.</p>
+  <div class="tracks">
+<div class="track">
+  <div class="title">MASTER — Tempest</div>
+  <div class="desc">60 s composition with per-bus envelopes + filter sweep + 3 events: 15 s freeze click · 30 s silence drop · 45 s drone burst.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_dynamic_MASTER_FINAL_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_dynamic/MASTER_FINAL.wav"></audio>
+  <div class="meta">178.6s · 48 kHz · mono · rms 0.408 · peak 0.950 · 16.3 MB · <a href="runs/multinet/net_dynamic/MASTER_FINAL.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Bus α — Foundation</div>
+  <div class="desc">Bass anchor (high envelope across full duration).</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_dynamic_bus_α_foundation_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_dynamic/bus_α_foundation.wav"></audio>
+  <div class="meta">178.6s · 48 kHz · mono · rms 0.501 · peak 1.000 · 16.3 MB · <a href="runs/multinet/net_dynamic/bus_α_foundation.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Bus β — Core</div>
+  <div class="desc">Peaks 22 s, fades by 30 s drop.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_dynamic_bus_β_core_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_dynamic/bus_β_core.wav"></audio>
+  <div class="meta">176.4s · 48 kHz · mono · rms 0.189 · peak 1.000 · 16.1 MB · <a href="runs/multinet/net_dynamic/bus_β_core.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Bus γ — Ghost</div>
+  <div class="desc">Enters 10 s, peaks 15 s (click), re-emerges 50 s.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_dynamic_bus_γ_ghost_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_dynamic/bus_γ_ghost.wav"></audio>
+  <div class="meta">178.6s · 48 kHz · mono · rms 0.198 · peak 1.000 · 16.3 MB · <a href="runs/multinet/net_dynamic/bus_γ_ghost.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Bus δ — Twin</div>
+  <div class="desc">Enters 20 s, peaks 28 s, gone by 35 s.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_dynamic_bus_δ_twin_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_dynamic/bus_δ_twin.wav"></audio>
+  <div class="meta">176.4s · 48 kHz · mono · rms 0.246 · peak 1.000 · 16.1 MB · <a href="runs/multinet/net_dynamic/bus_δ_twin.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Bus ε — Glitch</div>
+  <div class="desc">Spike 35→45 s.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_dynamic_bus_ε_glitch_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_dynamic/bus_ε_glitch.wav"></audio>
+  <div class="meta">178.6s · 48 kHz · mono · rms 0.254 · peak 1.000 · 16.3 MB · <a href="runs/multinet/net_dynamic/bus_ε_glitch.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Bus ζ — Drone</div>
+  <div class="desc">Sustains 30→60 s.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_dynamic_bus_ζ_drone_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_dynamic/bus_ζ_drone.wav"></audio>
+  <div class="meta">176.4s · 48 kHz · mono · rms 0.125 · peak 0.886 · 16.1 MB · <a href="runs/multinet/net_dynamic/bus_ζ_drone.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Bus η — Loop-B</div>
+  <div class="desc">Caption loop, 45→55 s climax.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_dynamic_bus_η_loopB_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_dynamic/bus_η_loopB.wav"></audio>
+  <div class="meta">178.6s · 48 kHz · mono · rms 0.323 · peak 0.884 · 16.3 MB · <a href="runs/multinet/net_dynamic/bus_η_loopB.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Bus θ — XFB</div>
+  <div class="desc">Cross-feedback, ends the piece at peak 0.45 weight.</div>
+  <img class="wave" src="runs/_thumbs/runs_multinet_net_dynamic_bus_θ_xfb_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/multinet/net_dynamic/bus_θ_xfb.wav"></audio>
+  <div class="meta">178.6s · 48 kHz · mono · rms 0.180 · peak 1.000 · 16.3 MB · <a href="runs/multinet/net_dynamic/bus_θ_xfb.wav">download</a></div>
+</div></div>
+</section>
+
+<section class="section" id="meta">
+  <h2>Meta-Symphony</h2>
+  <p class="blurb">Network of networks. All four macro-nets generate stems on a 3-min sub-bass seed; LFOs braid them in stereo with a sub-re-injection anchor.</p>
+  <div class="tracks">
+<div class="track">
+  <div class="title">META_SYMPHONY_FINAL (stereo, 180 s)</div>
+  <div class="desc">Network of networks. Four macro-net stems (N1, N3, N2, N_dyn) interwoven via LFO crossfade (60 s & 45 s) + stereo drift (20 s & 25 s) + 100 Hz sub re-injection. First stereo render in the AudioArt stack.</div>
+  <img class="wave" src="runs/_thumbs/runs_masterpiece_meta_symphony_META_SYMPHONY_FINAL_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/masterpiece/meta_symphony/META_SYMPHONY_FINAL.wav"></audio>
+  <div class="meta">178.6s · 48 kHz · stereo · rms 0.508 · peak 0.950 · 32.7 MB · <a href="runs/masterpiece/meta_symphony/META_SYMPHONY_FINAL.wav">download</a></div>
+</div></div>
+</section>
+
+<section class="section" id="archive">
+  <h2>Earlier Masterpieces (archive)</h2>
+  <p class="blurb">Pre-multinet experiments from earlier sessions. 180 s 8-track layered masters with harmonic exciter / sub-boost / LUFS mastering.</p>
+  <div class="tracks">
+<div class="track">
+  <div class="title">Final Symphony Bass Heavy</div>
+  <div class="desc">180 s bass-heavy master. 80 Hz crossover +8 dB sub-boost.</div>
+  <img class="wave" src="runs/_thumbs/runs_masterpiece_final_symphony_bass_heavy_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/masterpiece/final_symphony_bass_heavy.wav"></audio>
+  <div class="meta">176.4s · 48 kHz · stereo · rms 0.363 · peak 0.980 · 32.3 MB · <a href="runs/masterpiece/final_symphony_bass_heavy.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Neural Granular Symphony</div>
+  <div class="desc">8 tracks fragmented into 250 ms grains, stochastic interweaving.</div>
+  <img class="wave" src="runs/_thumbs/runs_masterpiece_neural_granular_symphony_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/masterpiece/neural_granular_symphony.wav"></audio>
+  <div class="meta">176.4s · 48 kHz · stereo · rms 0.475 · peak 1.000 · 32.3 MB · <a href="runs/masterpiece/neural_granular_symphony.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Full Spectrum Neural Galaxy</div>
+  <div class="desc">9-octave hyper-chord, triangular energy balancing.</div>
+  <img class="wave" src="runs/_thumbs/runs_masterpiece_full_spectrum_neural_galaxy_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/masterpiece/full_spectrum_neural_galaxy.wav"></audio>
+  <div class="meta">176.4s · 48 kHz · stereo · rms 0.469 · peak 1.000 · 32.3 MB · <a href="runs/masterpiece/full_spectrum_neural_galaxy.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Hi-Fi Enhanced Symphony</div>
+  <div class="desc">Harmonic exciter ≥8 kHz + 14 kHz air boost.</div>
+  <img class="wave" src="runs/_thumbs/runs_masterpiece_hifi_enhanced_symphony_1_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/masterpiece/hifi_enhanced_symphony_1.wav"></audio>
+  <div class="meta">176.4s · 48 kHz · stereo · rms 0.152 · peak 0.960 · 32.3 MB · <a href="runs/masterpiece/hifi_enhanced_symphony_1.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Defined Neural Galaxy</div>
+  <div class="desc">Tukey-windowed granular reconstruction.</div>
+  <img class="wave" src="runs/_thumbs/runs_masterpiece_defined_neural_galaxy_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/masterpiece/defined_neural_galaxy.wav"></audio>
+  <div class="meta">176.4s · 48 kHz · stereo · rms 0.110 · peak 0.950 · 32.3 MB · <a href="runs/masterpiece/defined_neural_galaxy.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">Neural Symphony 1 (original)</div>
+  <div class="desc">First multi-layer assembly, harmonic alignment.</div>
+  <img class="wave" src="runs/_thumbs/runs_masterpiece_neural_symphony_1_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/masterpiece/neural_symphony_1.wav"></audio>
+  <div class="meta">176.4s · 48 kHz · stereo · rms 0.378 · peak 1.000 · 32.3 MB · <a href="runs/masterpiece/neural_symphony_1.wav">download</a></div>
+</div></div>
+</section>
+
+</main>
+<footer>
+  Rendered <code>2026-05-27</code> from
+  <code>scripts/build_demo.py</code>. See
+  <a href="docs/MULTINET_ARCHITECTURE.md">MULTINET_ARCHITECTURE.md</a> and
+  <a href="docs/META_SYMPHONY_ARCHITECTURE.md">META_SYMPHONY_ARCHITECTURE.md</a>
+  for the underlying design. Open this file with <code>file://</code> or serve
+  the project root with <code>python -m http.server</code>.
+</footer>
+</body>
+</html>
