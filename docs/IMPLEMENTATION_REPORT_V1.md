@@ -39,6 +39,22 @@
 *   **Latent Memory**: 최근 40초간의 잠재 벡터를 버퍼에 저장.
 *   **Neural Graining**: 과거의 잠재 조각들을 현재에 무작위로 투사하여 "시간이 번진" 듯한 질감 구현.
 
+### 3.5 MVP-F (Neural Spectral Frozen) - *NEW*
+*   **Stochastic Shimmer**: 상위 50%의 층위(음색 광택)만 특정 시점의 값으로 동결. 
+*   **Periodic Crossfade**: 128 프레임 주기로 동결 상태를 부드럽게 갱신하여 인위적인 끊김(Beep) 대신 몽환적인 '일렁임(Shimmer)' 창출.
+
+### 3.6 MVP-G (Latent Feedback Echo) - *NEW*
+*   **Neural Feedback Loop**: 오디오가 아닌 잠재 공간 내에서 `z_out = z_curr + z_delay * feedback` 루프 형성.
+*   **Evolving Echo**: 단순 반복이 아닌, 모델이 해석을 거듭하며 음색 자체가 기괴하게 진화하는 뉴럴 피드백.
+
+### 3.7 MVP-H (Codebook Organ) - *NEW*
+*   **Generative Engine**: 외부 입력 오디오 없이, 소수(Prime)나 피보나치 수열을 이용해 NAC의 코드북 인덱스를 직접 생성.
+*   **Abstract Sound**: 인간의 개입이 완전히 배제된 신경망의 "원시적 언어" 연주.
+
+### 3.8 MVP-I (Neural Bass Massive) - *NEW*
+*   **Low-End Modulations**: EnCodec의 하위 퀀타이저(0~2) 레이어만 타겟팅.
+*   **Temporal Smearing & Codebook Jitter**: 저음의 시간을 늘려 심해 같은 공간감을 주고, 인접 코드북 인덱스를 섞어 거친 '뉴럴 디스토션' 생성.
+
 ---
 
 ## 4. [심화] 수치적 안전장치: Texture Governor & NaN Hardening
@@ -77,8 +93,46 @@
 
 ---
 
-## 7. 결과물 위치 및 최종본
+## 7. 대용량 오디오 마스터링 최적화 (OOM Bypass)
+1시간(약 68분) 분량의 대용량 오디오를 여러 겹으로 쌓아 올릴 때 발생하는 메모리 초과(OOM) 현상과 파이썬 프로세스 강제 종료(SIGKILL) 문제를 해결한 기술적 명세입니다.
+
+### 7.1 SoX (Sound eXchange) 커맨드라인 프로세싱
+*   **문제**: `librosa`를 이용한 실시간 리샘플링과 메모리 상의 거대 행렬(Float32, 68분, 8채널) 연산이 시스템 RAM을 100% 점유하여 강제 종료됨.
+*   **해결**: 파이썬의 오디오 연산 의존도를 낮추고, C 기반의 최적화된 오디오 프로세싱 도구인 **SoX**를 도입.
+*   **구현 (`scripts/run_hfo_master_sox.sh`, `scripts/run_f0_octave_sox_master.sh`)**:
+    *   디스크 스트리밍 방식의 필터링(`sinc`), 피치 시프팅(`pitch`), 멀티트랙 믹싱(`-m`)을 백그라운드 쉘 스크립트로 분리하여 실행.
+    *   **결과**: 메모리 누수 없이 68분짜리 오디오 8개를 10여 분 만에 안정적으로 합성에 성공.
+
+---
+
+## 8. 최종 마스터피스 및 마스터링 기법 명세
+
+### 8.1 Multi-source Granular Masterpiece (`neural_granular_symphony.wav`)
+*   **기법**: 8개의 소스 트랙을 250ms 단위의 잘게 쪼갠 조각(Grain)으로 분리.
+*   **Stochastic Interweaving**: 매 순간 무작위로 3개의 트랙만 선택하여 재생.
+*   **Micro-Temporal Jitter**: 선택된 조각들에 +/- 50ms의 시간적 오차를 두어 거대한 코러스 효과 창출.
+*   **결과**: 정적인 레이어링을 벗어나, 소리들이 서로 뒤섞이며 폭풍우처럼 몰아치는 역동적인 "신경망 소용돌이" 생성.
+
+### 8.2 Full-Spectrum Octave Spreading (`full_spectrum_neural_galaxy.wav`)
+*   **기법**: 8개 트랙을 단일 피치가 아닌, **가청 주파수 전체(-2 옥타브 ~ +2 옥타브)로 강제 분산 배치**.
+*   **Volume Balancing**: 저음역대(Sub)는 볼륨을 키우고 초고음역대(Sparkle)는 볼륨을 줄이는 삼각 형태의 에너지 밸런싱.
+*   **결과**: 가청 주파수를 빈틈없이 채우는 초거대 '뉴럴 하이퍼-코드(Hyper-Chord)' 완성.
+
+### 8.3 High-Fidelity Enhancement (`hifi_enhanced_symphony_1.wav`)
+*   **기법**: 저음역 간섭 배제, 초고음역대 해상도 극대화.
+*   **Harmonic Exciter**: 8kHz 이상 대역에 비선형 포화(Non-linear saturation)를 걸어 새로운 배음을 인공적으로 생성.
+*   **Air Boost**: 14kHz 대역 +10dB 쉘프 부스트 적용.
+*   **결과**: 답답한 디지털 질감을 벗어나, 크리스탈처럼 맑고 비싼(Expensive) 느낌을 주는 HD급 사운드 텍스쳐.
+
+### 8.4 Foundation 9-Octave Hyper-Chord (`foundation_hyperchord_limited.wav`)
+*   **기법**: 오직 원본(Foundation) 트랙 하나만을 재료로 사용하여 -4 옥타브부터 +4 옥타브까지 총 9번 겹쳐 쌓음.
+*   **결과**: 신경망 변조 없이 순수 피치 시프팅만으로 구축된, 파이프 오르간을 연상케 하는 웅장한 아날로그 드론 사운드.
+
+---
+
+## 9. 결과물 위치 및 최종본
 *   **최종 작품**: `runs/masterpiece/final_symphony_bass_heavy.wav`
 *   **안정성**: 180초 전 구간 결함 없음.
 *   **질감**: 8개 레이어의 유기적 중첩 및 LFO 오토메이션.
 *   **에너지**: -12 LUFS의 높은 음압과 +8dB의 서브 베이스 타격감.
+

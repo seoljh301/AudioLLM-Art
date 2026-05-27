@@ -1,5 +1,5 @@
 model:
-  device: "cuda:1"
+  device: "cuda:0"
   path: checkpoints/rave/guitar_iil_b2048_r48000_z16.ts
 perturb:
   noise_scale: 0.12
