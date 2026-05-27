@@ -2,6 +2,8 @@
 
 이 문서는 AudioArt 프로젝트의 기술적, 예술적 정당성을 확보하기 위해 현대 신경망 사운드 아트의 최전선에 있는 프로젝트들을 아키텍처 수준에서 상세히 분석합니다.
 
+> **심화 조사:** 본 케이스 스터디의 검증 결과 + 신규 65 개 항목 (모델 9, 이론 7, 예술가 6, 컨퍼런스 6 등) 은 [`UPDATES_V2.md`](UPDATES_V2.md) 에 정리. 일부 진술의 정정 (예: Björk 협업자 "Robin Meier" → "Robin Meier Wiratunga") 과 검증 부족 항목 표기 (`(미확인)`) 도 포함.
+
 ---
 
 ## 1. 실시간 스타일 전이와 구조 분리 (Structure vs Timbre)
@@ -51,14 +53,73 @@
 
 ---
 
+### 3.2 모델 가중치 병합과 모드 연결성 (MVP-D 의 학술적 정당성)
+
+*   **Git Re-Basin (Ainsworth, Hayase, Srinivasa, ICLR 2023, [arXiv:2209.04836](https://arxiv.org/abs/2209.04836)):** 독립적으로 학습된 두 네트워크가 weight 공간에서 *서로 다른 basin* 에 위치해 단순 보간이 무너지지만, **hidden unit 의 순열 (permutation symmetry)** 을 정렬하면 동일 basin 으로 끌어올 수 있다는 주장. 알고리즘 3 가지 (Activation Matching, Weight Matching, Straight-Through Estimator) 제시.
+*   **Linear Mode Connectivity (Frankle, Dziugaite, Roy, Carbin, ICML 2020, [arXiv:1912.05671](https://arxiv.org/abs/1912.05671)):** 같은 초기값에서 출발한 두 학습 trajectory 는 weight 공간에서 선형 경로로 연결됨. *공유 init 두 RAVE 학습* 권고의 이론 토대.
+*   **Model Soups (Wortsman et al., ICML 2022, [arXiv:2203.05482](https://arxiv.org/abs/2203.05482)):** 여러 fine-tune 결과의 가중치 평균이 단일 best 보다 일반화에 견고. V2 의 *Meta-Symphony Soup* — Net 1–4 의 가중치 평균 ensemble — 의 토대.
+*   **AudioArt 의 실증:** `src/modules/mvp_d/re_basin.py` (partial — inner-block 정렬, 21 resblock × grouped conv 인지) + `re_basin_full.py` (full — encoder chain 클래스 4종 + inner 7종 + tied-group 의미론). 함수 보존은 random-perm 검증으로 확인되었으나, **morph collapse 는 여전히 해소되지 않음** — decoder + gimbal + prior_net + latent_pca 도 정렬해야 함. `cliff_sweep_guitar_organ` 19 점에서 endpoint 영역 `t ∈ [0, 0.02] ∪ [0.98, 1]` 만이 유의미한 음악적 영역으로 확인됨.
+
+### 3.3 비-자동회귀 토큰 생성 (Net Max / V2 빠른 재생성 토대)
+
+*   **MAGNeT (Meta, [arXiv:2401.04577](https://arxiv.org/abs/2401.04577)):** masked non-autoregressive 토큰 생성으로 MusicGen 대비 약 7× 빠른 속도. text-to-music 의 *디코딩 병목* 을 깬다.
+*   **VampNet (Adobe + NU, ISMIR 2023, [arXiv:2307.04686](https://arxiv.org/abs/2307.04686)):** 마스크된 RVQ 토큰의 parallel iterative refinement. AudioArt 의 *MVP-C bend* 가 토큰을 *손상* 시킨다면 VampNet 은 *마스크 + 재생성* — 손상 후 복원의 학술적 사촌.
+*   **AudioArt 와의 연결:** V2 의 *Meta-Symphony 빠른 재생성* (현재 3 분 wall time → 30 초 목표) 에서 MAGNeT/VampNet 디코딩을 차용할 수 있음. 특히 *MVP-C 의 invalid_token 회복* 을 마스크 모델로 우회하면 더 풍부한 재구성 텍스처가 가능.
+
+---
+
 ## 4. 요약: AudioArt의 위치 (Positioning)
 
-| 연구/프로젝트 | 주안점 | AudioArt의 차별점 |
+| 연구/프로젝트 | 주안점 | AudioArt 의 차별점 |
 | :--- | :--- | :--- |
-| **AFTER / The Call** | 목소리/스타일 전이 | **비-인간적 텍스쳐**: 악기가 아닌 신경망 에러 자체의 미학 탐구 |
-| **Nature Manifesto** | 저전력/환경 설치 | **Massive Scale**: 1시간 분량의 대작 렌더링을 위한 SoX 기반 파이프라인 |
-| **Studies for** | 고속 생성 / 쿼리 제어 | **Macro-Architecture**: Net Max, Meta-Symphony와 같은 복합적인 네트워크 위상 설계 |
+| **AFTER / The Call** | 목소리/스타일 전이 | **비-인간적 텍스쳐** — 악기가 아닌 신경망 에러 자체의 미학 탐구 |
+| **Nature Manifesto** | 저전력/환경 설치 | **Massive Scale** — 1 시간 분량 대작 렌더링용 SoX 디스크 스트리밍 파이프라인 |
+| **Studies for** | 고속 생성 / 쿼리 제어 | **Macro-Architecture** — Net Max, Meta-Symphony 같은 복합 네트워크 위상 설계 |
+
+## 5. AudioArt 의 매크로 네트워크 — 선행 사례에 대한 답
+
+### 5.1 Net Max — 9 MVP 의 cross-feedback 통합
+선행 사례들은 대부분 *단일 변환*이거나 *2 종 모델의 결합*에 머문다. AudioArt 의 Net Max 는:
+- 9 개의 손상 양식 (latent perturb / caption loop / token bend / weight morph / granular memory / spectral freeze / latent feedback / generative drone / bass smear) 을 동시에 운용.
+- 8 버스 (α~θ) 의 cross-feedback (θ 가 β 의 출력을 tap) 로 *네트워크 안의 네트워크* 구조.
+- 2-pass 매크로 루프로 자기 강화.
+
+AFTER 의 "실시간 질감 전이" 가 *단일 차원* 의 transfer 라면, Net Max 는 9 차원이 동시에 작동하는 *다축 transfer*.
+
+### 5.2 Net Dynamic — 22 dB 다이내믹의 작곡적 격상
+Björk 의 Nature Manifesto, Studies for 시리즈가 *지속 가능한 텍스쳐 흐름* 에 초점을 두는 반면, AudioArt 의 Net Dynamic:
+- 같은 8 버스 구성에서 시간 가변 envelope + filter sweep + 3 impulse 이벤트 (15 s freeze CLICK, 30 s SILENCE DROP, 45 s drone BURST) 로 22 dB 다이내믹 레인지 달성.
+- 정적 텍스쳐를 *작곡* 의 차원으로 격상.
+
+### 5.3 Meta-Symphony — 매크로넷의 네트워크
+Holly Herndon 의 "The Call" 이 단일 모델 (Linked Diffusion) 의 multi-input 통합이라면, AudioArt 의 Meta-Symphony 는:
+- 4 개의 매크로넷 (Net 1 / 2 / 3 / Dynamic) 자체를 stem 으로 사용.
+- 3 분 stereo 타임라인 위 LFO crossfade (60 s / 45 s, LCM 180 s = 곡 길이) + 스테레오 pan drift (20 s / 25 s, LCM 100 s).
+- 100 Hz Butterworth 2 차 LPF + 시드 +8 dB sub-boost 재주입으로 anchored.
+
+---
+
+## 6. 향후 작업 — AudioLLM 단계 (V2)
+
+본 케이스 스터디 시점 (2026 년 5 월) 기준 AudioArt 는 V1 = *뉴럴 사운드 아트* 영역에 해당. 다음 V2 단계 = *AudioLLM 통합* 영역:
+
+| V1 (현재) | V2 (향후) |
+|---|---|
+| MVP-B stub (deterministic 형용사 + FM 합성) | MVP-B 실제 백본 (Qwen2-Audio + AudioLDM2) — Shumailov 의 model collapse 이론 실증 |
+| Texture Governor (NaN + RMS + flatness + centroid) | + **Semantic Governor** — 캡션 표류 임계치 기반 자동 wet 감쇠 |
+| 4 stem Meta-Symphony | 5 stem Meta-Symphony v2 — `stem_LLM` 추가 |
+| RAVE latent perturbation | + AudioLLM 임베딩 공간 perturbation (의미적 noise) |
+| 단일 매크로넷 토폴로지 | + `net_semantic`, `net_llm_chain`, `net_prompt_morph` — 캡션이 다른 net 의 파라미터 시간 가변 결정 |
+| 4 모델 통합 (RAVE × 2, EnCodec, ckpt morph) | + Mimi codec (MVP-J) — 의미적 + 음향적 토큰 분리 손상 |
+
+### 6.1 AudioArt V2 가 선행 사례에 다시 답하는 방식
+
+| 선행 사례 | V2 의 추가 답 |
+|---|---|
+| Holly Herndon **Spawn / The Call** | AudioLLM 캡션이 다음 단계 시드 생성을 *조건화* 하는 cross-modal loop — 인간 입력의 자리에 의미적 노이즈가 들어감 |
+| **Dadabots** SampleRNN 24-시간 스트림 | Semantic Governor 가 24-시간 스트림 중 *의미 표류* 까지 모니터링, 너무 멀어지면 자동 시드 재주입 |
+| Yuri Suzuki **Sonic Pendulum / Vox PopulA.I** | 청중의 발화 → AudioLLM 캡션 → 다른 매크로넷 파라미터 조건화 → 실시간 다축 변형 |
 
 ---
 **업데이트:** 2026년 5월  
-**분석 키워드:** Latent Diffusion, Adversarial Disentanglement, Masked Generative Modeling, Model Collapse.  
+**분석 키워드:** Latent Diffusion, Adversarial Disentanglement, Masked Generative Modeling, Model Collapse, Cross-modal Conditioning.  

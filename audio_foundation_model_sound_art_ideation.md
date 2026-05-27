@@ -187,10 +187,51 @@ Checkpoint morphing texture synthesizer.
 
 # 9. Post-Prototyping Reflection (2026)
 
-이 프로젝트는 초기 아이디어인 "신경망 오용(Misuse)"을 넘어, 9개의 MVP 모듈과 거대 매크로 네트워크(Multinet), 그리고 최종적인 Meta-Symphony로 완성되었다. 프로토타이핑 과정에서 얻은 주요 통찰은 다음과 같다.
+이 프로젝트는 초기 아이디어인 "신경망 오용(Misuse)"을 넘어, **9 개의 MVP 모듈** + **5 개의 매크로 네트워크 (Multinet)** + 최상위 **Meta-Symphony** + 정적 **데모 페이지**까지 완성되었다.
 
-1.  **Anchored Corruption의 유효성**: 단순히 모델을 폭주시키는 것보다, 80Hz 크로스오버와 같은 물리적 '닻(Anchor)'을 내렸을 때 훨씬 더 음악적이고 압도적인 예술적 결과물이 나왔다.
-2.  **모드 연결성(Mode Connectivity)의 한계와 활용**: MVP-D(Morphing)에서 발견된 '중간 지점의 무음 붕괴'는 기술적으로는 실패였으나, 예술적으로는 '유령 같은 잔향'이라는 새로운 프리셋으로 재탄생했다.
-3.  **스케일의 확장**: 실시간 처리를 넘어 1시간 분량의 대작(`Ulaanbaatar Epic`)을 렌더링하면서, 파이썬의 한계를 SoX 커맨드라인 스트리밍으로 극복한 것은 기술적 성숙도를 증명했다.
+## 9.1 실제 빌드된 구성요소
 
-초기의 "실패의 미학"은 이제 "정교하게 설계된 신경망 교향곡"이라는 구체적인 형상을 갖추게 되었다.
+| 단계 | 구현물 | 위치 |
+|---|---|---|
+| MVP 9 종 (A–I) | latent perturb · caption loop · token bend · ckpt morph · neural granular · spectral freeze · latent feedback · codebook organ · bass massive | `src/modules/mvp_*` |
+| 공통 인프라 | Texture Governor (NaN 가드 + flatness / RMS / centroid 임계치) + Mix Engine (dry/wet + 80 Hz crossover + soft limiter) + OSC bridge | `src/core/{mix,texture_governor,texture_metrics,osc_bridge}.py` |
+| 매크로 네트워크 5 종 | Net 1 / 2 / 3 / Net Max (9 MVP 모두) / Net Dynamic (22 dB 다이내믹) | `scripts/multinet.py` |
+| 메타 작곡 | Meta-Symphony — 4 매크로넷 stem 을 LFO crossfade + 스테레오 드리프트로 3 분 stereo 곡 | `scripts/meta_symphony.py` |
+| 검증 데모 | 52 트랙 정적 HTML + waveform PNG 썸네일 | `demo.html` + `scripts/build_demo.py` |
+| 대용량 마스터링 | LUFS −12 + SoX 디스크 스트리밍 | `scripts/pyloudnorm_mastering.py`, `scripts/run_hfo_master_sox.sh` |
+
+## 9.2 핵심 통찰
+
+1. **Anchored Corruption 의 유효성**: 단순 폭주보다 80 Hz 크로스오버 같은 물리적 닻이 훨씬 더 음악적 결과를 만든다. 모든 매크로넷이 이 한 줄에 의존.
+2. **모드 연결성의 한계와 재활용**: MVP-D 의 *중간 무음 붕괴* 는 기술적 실패였지만 "유령 잔향" 프리셋으로 재탄생. Re-Basin (partial + full encoder) 까지 시도했으나 결국 cliff sweep 으로 `t ∈ [0, 0.02] ∪ [0.98, 1]` 운영이 최선.
+3. **스케일 확장**: 1 시간 대작 `Ulaanbaatar Epic` 까지. Python 메모리 한계는 SoX 디스크 스트리밍으로 우회.
+4. **Texture Governor 의 결정성**: 9 MVP × 5 매크로넷 × 메타-심포니 전체 파이프라인에서 NaN 도달이 단 한 번도 발생하지 않음. 2:08 끊김 사고 후 도입된 NaN emergency 가 결정적.
+5. **다이내믹 vs 정적의 차이**: Net Max 4 dB vs Net Dynamic 22 dB — 같은 8 버스라도 시간 가변 envelope + filter sweep + impulse 이벤트가 결과를 *작곡*으로 격상.
+
+## 9.3 §7 의 원래 MVP 제안 vs 실제 구현
+
+| 원래 제안 | 실제 빌드 |
+|---|---|
+| MVP-A: RAVE + Max latent perturbation | MVP-A + smoothed Brownian noise mode ✓ |
+| MVP-B: Caption ↔ TTA recursive loop | MVP-B (stub backend, 실제 백본은 V2 로) ⚠️ |
+| MVP-C: EnCodec token corruption | MVP-C 4 모드 + grouped quantizer_range ✓ |
+| MVP-D: Checkpoint morphing | MVP-D + partial/full Re-Basin + endpoint cliff sweep + A+D bilateral dropout ✓ |
+| (계획에 없던 추가 MVP) | MVP-E/F/G/H/I — feedback_1 design 원리를 따라 자연 발생 |
+
+§7 의 4 개 MVP 가설 모두 검증되었고, 검증 과정에서 새 MVP 5 개가 자연 발생.
+
+## 9.4 향후 작업 — AudioLLM 단계
+
+프로젝트 명칭 **"AudioLLM-Art"** 가 가리키듯, 현재까지는 *뉴럴 사운드 아트* 영역의 V1 — 다음 단계 V2:
+
+- **MVP-B 실제 백본 활성화** (Qwen2-Audio + AudioLDM2, ~18 GB) — stub → 실제 의미적 표류.
+- **AudioLLM 조건부 매크로넷** (`net_semantic`, `net_llm_chain`, `net_prompt_morph`) — 캡션이 다른 매크로넷의 파라미터를 시간 가변으로 결정.
+- **Semantic Governor** — Texture Governor 의 의미 측 짝. 캡션 표류 과대 시 자동 감쇠.
+- **Meta-Symphony v2 — 5 stem** — 현재 4 stem 에 `stem_LLM` 추가.
+- **AudioLLM 자체 손상** — 캡션 모델 임베딩 공간에 직접 노이즈 — *AudioLLM 도메인의 perturbation*. feedback_1 의 §13–§16 원칙을 의미 도메인에 다시 적용.
+
+V1 결과는 *Pre-AudioLLM* 라벨로 보존된다.
+
+---
+
+초기의 "실패의 미학" 은 이제 *정교하게 설계된 신경망 교향곡* 이라는 구체적 형상을 갖추었고, "AudioLLM-Art" 라는 이름이 실제로 가리킬 다음 단계가 명확해졌다.

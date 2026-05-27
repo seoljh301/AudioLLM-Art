@@ -6,7 +6,7 @@
 > - [`META_SYMPHONY_ARCHITECTURE.md`](META_SYMPHONY_ARCHITECTURE.md) — 이 5개 net을 다시 엮는 메타 네트워크
 > - [`feedback_1.md`](feedback_1.md) — 설계 원리 ("Anchored Corruption", Texture Guard)
 > - [`IMPLEMENTATION_REPORT_V1.md`](IMPLEMENTATION_REPORT_V1.md) — 구현 로그
-> - [`related_work.md`](related_work.md) — 관련 연구 서베이
+> - [`Related Works/RESEARCH_SURVEY.md`](Related%20Works/RESEARCH_SURVEY.md) + [`Related Works/DETAILED_CASE_STUDIES.md`](Related%20Works/DETAILED_CASE_STUDIES.md) — 관련 연구 서베이
 
 ---
 

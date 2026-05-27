@@ -143,3 +143,78 @@
 *   **안정성**: 180초 전 구간 결함 없음.
 *   **질감**: 8개 레이어의 유기적 중첩 및 LFO 오토메이션.
 *   **에너지**: -12 LUFS의 높은 음압과 +8dB의 서브 베이스 타격감.
+
+---
+
+## 10. Multinet — 매크로 네트워크 5종 (`scripts/multinet.py`)
+
+`feedback_1.md` 의 anchored corruption 원리를 단일 MVP 너머의 거시 작곡에 적용한 5개의 매크로 신호 그래프. 자세한 토폴로지는 [`MULTINET_ARCHITECTURE.md`](MULTINET_ARCHITECTURE.md).
+
+| Net | 분류 | 사용 MVP | V100 wall time | Master rms |
+|---|---|---|---|---|
+| Net 1 — Crystal Cathedral | 5-bus 병렬 | A C D F G H I | ~1.5 s | 0.232 |
+| Net 2 — Recursive Organ | 3-pass 매크로 피드백 | A C F G | ~2 s | 0.058 |
+| Net 3 — Decoding Chamber | 직선 9 단 | A C D E F G I | ~2 s | 0.177 |
+| **Net Max — Cathedral Hive** | 8-bus + cross-feedback + 2-pass | A B C D E F G H I (9개 모두) | ~24 s | 0.260 |
+| **Net Dynamic — Tempest** | 8-bus + 시간 가변 envelope + filter sweep + 3 impulse | A B C D E F G H I (9개 모두) | ~20 s | 0.30 평균 (0.05–0.60) |
+
+### 10.1 Net Max 의 8 버스 구조
+*   `α Foundation`: I → C(invalid_token) → 80Hz crossover +10dB
+*   `β Core`: A → D(guitar) → E → G → A(drop) → F (6 단 RAVE 도메인 손상)
+*   `γ Ghost`: F → G → C(shuffle) → F (freeze 중첩)
+*   `δ Twin`: D(organ t=0.995) → A → C → E (오르간 측 모핑)
+*   `ε Glitch`: C(rate=0.10) → I(fold) → G (강한 손상)
+*   `ζ Drone`: H(prime) + H(fibonacci) → A (생성 베드)
+*   `η Loop-B`: B 캡션 → TTA depth=3 (의미 표류, 현재 stub)
+*   `θ XFB`: β 출력 → G(deep) → I(fold) (cross-bus 피드백)
+
+Pass 1 + Pass 2 (refed seed 로 재실행) + S-curve crossfade 로 MASTER_FINAL 생성. 6개의 독립 음정 영역이 동시 점유 (sub 49–82 Hz / 207 / 337 / 432–444 / 439–442 / 660).
+
+### 10.2 Net Dynamic 의 시간 가변 다이내믹
+같은 8 버스를 한 번 렌더한 후 post-automation 단계에서:
+*   버스별 진폭 envelope (구간별 선형 + 0.3 s 스무딩) — 60 초 작곡 arc 형성
+*   3 impulse 이벤트: 15s freeze CLICK, 30s SILENCE DROP, 45s drone BURST
+*   Master 저역통과 sweep: 250 Hz → 12 kHz → 500 Hz → 16 kHz → 6 kHz 시간 가변
+*   초당 master RMS 범위 0.046 ~ 0.605 → **22 dB 다이내믹 레인지** (Net Max 의 5배)
+
+---
+
+## 11. Meta-Symphony — 매크로넷의 네트워크 (`scripts/meta_symphony.py`)
+
+4 개 매크로넷의 출력을 3 분 stereo 타임라인 위에서 엮는 최상위 작곡. AudioArt 스택의 첫 stereo 출력. 자세한 설계: [`META_SYMPHONY_ARCHITECTURE.md`](META_SYMPHONY_ARCHITECTURE.md).
+
+*   **Phase 1 스템 생성** (mono, 180 s 시드): Net 1 (raw) → Net 3 (RMS_match seed←Net 1), Net 2 (raw, 2-pass) → Net Dynamic (RMS_match seed←Net 2). 두 직렬 의존 chain 으로 같은 시드를 *이미 뉴럴 처리된* 형태로 다음 net 에 전달.
+*   **Phase 2 인터위빙** (stereo): LFO crossfade `lfo_A=½+½sin(2π·t/60)` 와 `lfo_B=½+½cos(2π·t/45)`; 스테레오 pan `pan_A=0.7sin(2π·t/20)` + `pan_B=0.7cos(2π·t/25)`. LCM(60,45)=180 초로 곡 끝에서 위상 정렬, LCM(20,25)=100 초로 Lissajous.
+*   **Phase 3 Foundation 강화**: 100 Hz 2 차 Butterworth LPF + 시드 +8 dB sub-boost 양 채널 재주입, tanh limiter drive=1.25, peak 0.95 정규화.
+
+V100 단일 GPU wall time 약 3 분. 최종 `META_SYMPHONY_FINAL.wav` ~ 35 MB (180 s × stereo × 48 kHz).
+
+---
+
+## 12. 정적 데모 페이지 (`scripts/build_demo.py` → `demo.html`)
+
+운영자 / 외부 청취자가 모든 단계 출력을 한 페이지에서 검증할 수 있도록 정적 HTML 데모를 빌드.
+
+*   GitHub dark 톤 (#0d1117 배경, #7fffd4 accent), sticky top nav, responsive 카드 그리드.
+*   각 트랙 카드: 제목 + 한국어 설명 + waveform PNG (320×80 px) + native `<audio controls preload="none">` + 메타데이터 (duration, SR, channels, RMS, peak, file size) + 다운로드 링크.
+*   9 섹션 / 52 트랙: Seeds (4) · Net 1 (6) · Net 2 (4) · Net 3 (8) · Net Max p1 (9) · Net Max p2 + Final (5) · Net Dynamic (9) · Meta-Symphony (1) · Archive (6).
+*   Waveform 썸네일은 `runs/_thumbs/<safe_id>.png` 에 캐시. wav가 변경된 트랙만 재생성.
+*   실행: `python scripts/build_demo.py` → `demo.html` (32 KB).
+*   재생: `python -m http.server 8765 --bind 127.0.0.1` 후 `http://localhost:8765/demo.html`.
+
+Manifest 는 `build_demo.py` 안에 SEEDS / NET1 / NET2 / NET3 / NET_MAX_PASS1 / NET_MAX_PASS2_FINAL / NET_DYN / META / ARCHIVE 8 개 Python 리스트로 분리. 새 트랙 추가 시 해당 리스트에 한 줄 추가 후 재실행.
+
+---
+
+## 13. 향후 작업 — AudioLLM 통합
+
+프로젝트 명칭 "AudioLLM-Art" 가 가리키듯, 현재까지는 *뉴럴 사운드 아트* 단계의 V1 구현. 다음 단계의 V2 는 다음을 포함한다:
+
+1. **MVP-B 실제 백본 활성화** — `caption.backend=qwen2_audio` + `tta.backend=audioldm2` 로 전환. Qwen2-Audio-7B-Instruct (~14 GB) + AudioLDM2 (~4 GB) 다운로드. Net Max / Net Dynamic 의 η 버스가 의미적으로 살아 움직임.
+2. **Semantic Governor** — Texture Governor 와 짝을 이루는 의미 측면의 가드. 청크 캡션이 시드 의미와 너무 멀어지면 자동 wet 감쇠.
+3. **AudioLLM 조건부 매크로넷** — `net_semantic`, `net_llm_chain`, `net_prompt_morph` 등 캡션 텍스트가 다른 net 의 파라미터를 시간 가변으로 결정하는 새 토폴로지.
+4. **Meta-Symphony v2 — 5-stem 인터위빙** — 현재의 4 stem 에 `stem_LLM` 추가, 멀티 모달 텍스트-사운드 cross-modal loop.
+5. **AudioLLM 자체 손상** — 캡션 모델의 텍스트 임베딩 공간에 직접 노이즈 주입, 의미 표류의 "결" 자체를 변형. *AudioLLM 도메인의 perturbation*.
+6. **재현성 패키지 자동 생성** — 각 마스터피스 wav 와 함께 git hash + config + 모델 SHA + LUFS 측정 결과를 sidecar JSON 으로 묶는 빌더.
+
+V1 의 최종 결과 (`runs/masterpiece/meta_symphony/META_SYMPHONY_FINAL.wav` 등) 는 *Pre-AudioLLM* 라벨로 보존된다.

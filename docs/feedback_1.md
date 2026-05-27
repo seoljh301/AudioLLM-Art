@@ -1311,3 +1311,80 @@ safety ↑ → governor stronger
 > **겨우 오해할 수 있는 정도로만 괴롭혀야 한다.**
 
 ---
+
+# 18. 이후 구현 보고 (Post-Implementation, 2026)
+
+feedback_1 작성 당시에는 4개의 MVP (A, B, C, D) 만 존재했다. 그 이후 본 설계 원리에 따라 다음 항목들이 실제로 구현되었다.
+
+## 18.1 새 MVP 5종 (E ~ I)
+
+원래 MVP-A 의 latent perturbation 한 갈래만 가지고 있던 RAVE 도메인이 다섯 종의 변종으로 분화했다. 모두 anchored corruption 원리를 그대로 따라간다 — *원본 구조는 잡아둔 채 표면만 변형*.
+
+| MVP | 손상 모드 | feedback_1 원칙과의 연결 |
+|---|---|---|
+| **E** Neural Granular | latent 메모리 버퍼에서 과거 grain 을 현재로 투사 | "local continuity" 보존 — 시간 표류를 점진적으로 |
+| **F** Spectral Frozen | 상위 50% latent 차원을 주기적으로 동결 + crossfade | "upper/detail 만 손상" 원칙의 직접 구현 |
+| **G** Latent Feedback | latent 공간 delay line 으로 재귀 에코 | "feedback entropy governor" — 자기 진화 메아리 |
+| **H** Codebook Organ | 입력 없이 소수/Fibonacci 토큰 직접 생성 | drone bed 로 사용, 다른 버스의 anchor 역할 |
+| **I** Bass Massive | 하위 RVQ 토큰 smear/jitter/fold | "lower/coarse structure 보존" 원칙의 부분 위배 — 단, sub-bass 영역만 손상시켜 다른 트랙의 80 Hz crossover 와 결합 시에는 결과적으로 anchored |
+
+각 MVP 디렉토리에 자체 `results.json` 과 `README.md` 가 있고, 음상 sweep 결과까지 기록되어 있다.
+
+## 18.2 Texture Guard 의 코드 실현
+
+§13–§16 에서 제안된 텍스쳐 보호 장치는 `src/core/` 안에 다음 모듈로 구현되었다:
+
+- **`mix.py`** — dry/wet anchor + RMS match + soft tanh limiter + 80 Hz crossover anchor (sub_boost_db 옵션 포함).
+- **`texture_metrics.py`** — RMS / spectral flatness / spectral centroid / ZCR / NaN-Inf 감지.
+- **`texture_governor.py`** — flatness > 0.55, RMS 범위 ([1e-4, 0.85]), centroid > Nyquist × 0.42 임계치 기반 청크별 자동 wet 감쇠. NaN 감지 시 emergency wet=0.
+
+모든 MVP render 함수가 청크 단위로 이 가드를 통과한다. 운영 중 2:08 지점에서 일어났던 NaN 발생 끊김 사고가 이 가드로 해결됐다.
+
+## 18.3 매크로 작곡 단계 — Multinet
+
+9 개 MVP 를 묶는 5 개 매크로 네트워크가 `scripts/multinet.py` 안에 정의됐다:
+
+| Net | 분류 | feedback_1 의 어느 원칙을 적용 |
+|---|---|---|
+| **Net 1** Crystal Cathedral | 5-bus 병렬 믹스 | 다층 동시 손상이지만 각 버스가 dw < 0.7 + 80 Hz 앵커로 묶임 |
+| **Net 2** Recursive Organ | 3-pass 매크로 피드백 | feedback entropy governor 의 직접 시연 — pass 가 누적될수록 정체성 표류 |
+| **Net 3** Decoding Chamber | 직선 9 단 손상 | 단계별 dw=0.45 + 80 Hz crossover 분기로 dry 앵커 — collapse 방지의 모범 사례 |
+| **Net Max** Cathedral Hive | 8-bus + cross-feedback + 2-pass | 모든 9 개 MVP 통합 — anchored corruption 의 풀-스케일 적용 |
+| **Net Dynamic** Tempest | 8 버스 + 시간 가변 envelope + filter sweep + 3 impulse 이벤트 | "정적 텍스쳐 → 작곡" 으로 격상 |
+
+자세한 토폴로지: [`MULTINET_ARCHITECTURE.md`](MULTINET_ARCHITECTURE.md).
+
+## 18.4 메타 작곡 단계 — Meta-Symphony
+
+매크로넷의 네트워크. 4 개 매크로 출력을 3 분 타임라인 위에서 LFO crossfade (60s/45s) + 스테레오 드리프트 (20s/25s) + 100 Hz sub 재주입으로 엮어 stereo 최종 작품 생성. AudioArt 스택에서 첫 stereo 출력. 자세한 설계: [`META_SYMPHONY_ARCHITECTURE.md`](META_SYMPHONY_ARCHITECTURE.md).
+
+## 18.5 검증 가능 데모
+
+`scripts/build_demo.py` 가 모든 단계의 wav 와 waveform 썸네일을 한 페이지로 묶어 `demo.html` 로 출력. 52 트랙 + 9 섹션 + sticky nav. 외부 청취자가 한 번에 결과를 검증할 수 있는 형태.
+
+## 18.6 결국 무엇이 작동했는가
+
+feedback_1 의 7개 핵심 명제 중 실제로 가장 결정적이었던 것:
+
+1. **80 Hz crossover + sub_boost** — 거의 모든 매크로넷에서 이 한 줄이 collapse 와 noise 표류를 같이 막는다.
+2. **per-stage dw < 0.7** — 누적 손상 체인의 안정성을 보장.
+3. **Texture Governor 의 청크별 자동 감쇠** — 외부에서 손을 대지 않아도 시스템이 알아서 깨끗한 채로 머문다.
+4. **MVP-D collapse 의 endpoint-only 사용** — Re-Basin 까지 시도했으나 결국 cliff sweep 으로 운영 영역을 좁히는 게 가장 실용적.
+
+가장 덜 작동했던 것:
+- **shuffle_window 의 효과** — 미세 윈도우 안 셔플은 의도와 달리 큰 차이가 없었다. 토큰 도메인의 시간 해상도 (75 fps) 가 너무 거칠어, window=12 와 window=4 가 청각적으로 거의 동일.
+- **MVP-B 의 의미적 표류** — stub backend 만 동작 가능했고, 실제 Qwen2-Audio + AudioLDM2 다운로드는 다음 단계로 미뤄졌다.
+
+## 18.7 향후 작업 — AudioLLM 통합
+
+프로젝트 이름 **"AudioLLM-Art"** 가 가리키는 다음 단계는 현재 stub 으로 동작하는 MVP-B 의 실제 활성화와, AudioLLM 을 다른 모든 매크로넷의 의미 조건화 신호로 확장하는 것이다:
+
+1. **MVP-B 실제 백본 활성화** — Qwen2-Audio-7B-Instruct (캡션) + AudioLDM2 (TTA) 다운로드 (~18 GB) 후 stub 대체.
+2. **AudioLLM-aware perturbation** — 캡션 결과 텍스트를 다른 MVP 의 파라미터로 매핑 (예: "metallic" → C.bend.rate↑, F.auto_upper_fraction↑).
+3. **Semantic anchor** — 80 Hz sub-bass 가 *물리적* 닻이라면, AudioLLM 캡션은 *의미적* 닻이 될 수 있다. 청크의 캡션이 너무 멀어지면 wet 감쇠 — Semantic Governor.
+4. **Multi-agent caption ensemble** — Qwen-Audio, SALMONN, Pengi 의 disagreement 를 새 noise 채널로.
+5. **AudioLLM 자체 손상** — 캡션 모델의 텍스트 임베딩 공간에 직접 노이즈 주입, 의미 표류의 "결" 자체를 변형.
+
+이 단계가 들어오면 feedback_1 의 7번 명제 "MVP-D collapse 는 thin ghost layer 로" 같은 식의 *어떻게 안 죽일 것인가* 원칙이, AudioLLM 도메인에 새로 다시 한 번 적용되어야 한다.
+
+---

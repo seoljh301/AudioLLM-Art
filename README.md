@@ -16,7 +16,7 @@
 - **아키텍처 시각화**: [`docs/MULTINET_ARCHITECTURE.md`](docs/MULTINET_ARCHITECTURE.md)
 - **구현 로그**: [`docs/IMPLEMENTATION_REPORT_V1.md`](docs/IMPLEMENTATION_REPORT_V1.md)
 - **렌더 연대기**: [`docs/WORKFLOW_HISTORY.md`](docs/WORKFLOW_HISTORY.md)
-- **관련 연구 서베이**: [`docs/related_work.md`](docs/related_work.md)
+- **관련 연구 서베이**: [`docs/Related Works/RESEARCH_SURVEY.md`](docs/Related%20Works/RESEARCH_SURVEY.md) + [`docs/Related Works/DETAILED_CASE_STUDIES.md`](docs/Related%20Works/DETAILED_CASE_STUDIES.md)
 - **설계 원리 (한국어)**: [`docs/feedback_1.md`](docs/feedback_1.md)
 
 ---
