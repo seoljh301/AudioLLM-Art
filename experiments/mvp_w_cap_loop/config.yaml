@@ -1,0 +1,6 @@
+n_iters: 4
+duration_per_step_s: 6.0
+keep_mix: 0.0
+sr: 22050
+use_real: false
+save_intermediates: true

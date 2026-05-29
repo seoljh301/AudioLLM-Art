@@ -1,0 +1,11 @@
+sample_rate: 22050
+n_fft: 2048
+hop: 512
+win: 2048
+
+mode: random_uniform   # random_uniform | frame_swap | bin_swap | rotate | ou
+rate: 1.0
+smooth: 0.92
+rotate_max: 3.14159
+seed: 0
+dry_wet: 1.0

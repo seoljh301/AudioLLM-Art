@@ -1,0 +1,9 @@
+codec: encodec_24khz
+bandwidth: 6.0
+device: cuda
+chunk_seconds: 1.0
+walk_mode: prime         # prime | fibonacci | random_walk
+base_seed_offset: 0
+walk_strength: 5
+dry_wet: 1.0
+use_real: false

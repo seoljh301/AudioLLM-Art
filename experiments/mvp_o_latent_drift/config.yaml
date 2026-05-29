@@ -1,0 +1,9 @@
+model_path: checkpoints/rave/guitar_iil_b2048_r48000_z16.ts
+device: cuda
+duration_s: 10.0
+mode: smoothed     # white | smoothed | ou | sinusoid
+sigma: 1.0
+smooth: 0.985
+drift_rate: 0.0
+base_freqs_hz: [0.1, 0.23, 0.41, 0.79]
+seed: 0

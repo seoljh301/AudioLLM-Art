@@ -1,0 +1,14 @@
+codec: encodec_24khz
+bandwidth: 6.0     # → n_q = 8 @ 75 fps
+device: cuda
+
+grain_size: 8       # token frames @ 75 Hz ≈ 107 ms
+stride: 4
+target_stride: 8
+
+dist: weighted_hamming    # hamming | weighted_hamming | first_q
+q_weights: [1.0, 0.7, 0.5, 0.3, 0.2, 0.15, 0.1, 0.08]
+temperature: 0.5
+walk_strength: 0.0
+dry_wet: 1.0
+seed: 0

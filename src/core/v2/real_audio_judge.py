@@ -31,22 +31,29 @@ class RealAudioJudge:
         # Load audio (Qwen2-Audio expects 16kHz)
         audio, sr = librosa.load(audio_path, sr=16000)
         
-        prompt = f"""
-        <|audio_bos|><|AUDIO|><|audio_eos|>
-        You are a harsh, avant-garde music critic. 
-        The artist was trying to achieve this aesthetic: "{target_aesthetic}".
-        Listen to the audio. 
-        1. Describe exactly what rhythms and textures you hear.
-        2. Give it a score from 1 to 10 based on how well it matches the target aesthetic.
-        3. Give very specific instructions to the drum sequencer (e.g., "Add more high-frequency stuttering", "Make the bass drum hit more irregularly", "Increase the ratcheting on the snare") to improve it.
-        Keep your response concise.
-        """
+        user_text = f"""The artist was trying to achieve this aesthetic: "{target_aesthetic}".
+Listen to the audio. 
+1. Describe exactly what rhythms and textures you hear.
+2. Give it a score from 1 to 10 based on how well it matches the target aesthetic.
+3. Give very specific instructions to the drum sequencer (e.g., "Add more high-frequency stuttering", "Make the bass drum hit more irregularly", "Increase the ratcheting on the snare") to improve it.
+Keep your response concise."""
+
+        conversation = [
+            {"role": "system", "content": "You are a harsh, avant-garde music critic."},
+            {"role": "user", "content": [
+                {"type": "audio", "audio_url": audio_path},
+                {"type": "text", "text": user_text}
+            ]}
+        ]
+        
+        text = self.processor.apply_chat_template(conversation, add_generation_prompt=True, tokenize=False)
         
         inputs = self.processor(
-            text=prompt, 
-            audios=audio, 
+            text=text, 
+            audios=[audio], 
             sampling_rate=16000, 
-            return_tensors="pt"
+            return_tensors="pt",
+            padding=True
         ).to(self.device, torch.float16)
 
         with torch.no_grad():

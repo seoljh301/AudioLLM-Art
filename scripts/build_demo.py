@@ -266,6 +266,30 @@ V2 = [
           "δ 줄기.", "v2", 4),
 ]
 
+HYPER_MAX = [
+    Track("HYPER-MAX — MASTER (171 s)",
+          "runs/hyper_max/master_180s.wav",
+          "24 MVP × 4 movement × 45 s. ∅→audio Genesis → Latent surge → Token storm → "
+          "Final wash. crossfade 3 s × 3. procedural backend.",
+          "hyper_max", 0),
+    Track("M1 Genesis (Y · O · H · P · S · D)",
+          "runs/hyper_max/movement_1_genesis.wav",
+          "발원지 6 stem 합주. weight / latent / tokens / STFT / text 다섯 도메인 모두 ∅→audio.",
+          "hyper_max", 1),
+    Track("M2 Latent surge (A · E · F · G · K · U)",
+          "runs/hyper_max/movement_2_latent.wav",
+          "M1 입력 → 6 latent mutator 병렬. 마지막 U 가 caption bias 추가.",
+          "hyper_max", 2),
+    Track("M3 Token storm (C · I · J · L · V · R)",
+          "runs/hyper_max/movement_3_tokens.wav",
+          "M2 입력 → token 도메인 6 stem. R 이 자기 자신을 corpus 로 musaicing.",
+          "hyper_max", 3),
+    Track("M4 Final wash (Q · N · M · T · W · B)",
+          "runs/hyper_max/movement_4_final.wav",
+          "전체 prior 를 corpus 로 사용. STFT/concat/recursive 6 stem 종합 wash.",
+          "hyper_max", 4),
+]
+
 ARCHIVE = [
     Track("Final Symphony Bass Heavy",
           "runs/masterpiece/final_symphony_bass_heavy.wav",
@@ -337,6 +361,12 @@ def main() -> None:
         "Network of networks. All four macro-nets generate stems on a 3-min sub-bass "
         "seed; LFOs braid them in stereo with a sub-re-injection anchor.",
         META))
+    sections_html.append(section_block(
+        "Net Hyper-Max — 24 MVP × 180 s",
+        "프로젝트의 24 MVP 전부를 한 곡에 등장시키는 최대 규모 합주. 4 movement × "
+        "6 MVP × 45 s, 3 s cosine crossfade. Genesis (∅→audio) → Latent surge → "
+        "Token storm → Final wash. 자세한 구조: docs/HYPER_MAX_ARCHITECTURE.md.",
+        sorted(HYPER_MAX, key=lambda t: t.order)))
     sections_html.append(section_block(
         "V2 — Ulaanbaatar Epic",
         "AudioArt V2 의 첫 대작. Neural Physics (Temporal Warp · Latent Pan · MIDI "

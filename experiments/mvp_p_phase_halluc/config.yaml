@@ -1,0 +1,11 @@
+mode: shaped_smooth   # white | pink | shaped_smooth | chord | comb
+duration_s: 10.0
+sr: 22050
+n_fft: 2048
+hop: 512
+griffin_lim_iters: 32
+smooth_t: 0.92
+smooth_f: 0.85
+chord_freqs_hz: [110.0, 165.0, 220.0, 330.0]
+chord_bw_bins: 3
+seed: 0

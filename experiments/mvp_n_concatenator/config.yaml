@@ -1,0 +1,16 @@
+sample_rate: 22050
+n_fft: 2048
+hop: 512
+win: 2048
+
+# particle filter
+P: 100              # particles
+p: 5                # corpus windows per particle
+pd: 0.95            # temporal-continuity transition prob
+tau: 10.0           # softmax temperature on KL distance
+L: 10               # KL-NMF iterations
+ess_threshold: 0.5  # fraction of P for resampling trigger
+l2_reg: 0.0
+seed: 0
+
+dry_wet: 1.0

@@ -17,7 +17,8 @@ def run_real_llm_demo():
     print("=== The Ultimate Closed-Loop: Real LLM Composer + Real AudioLLM Judge ===")
     
     # 1. Initialize the Real LLM Agent (The Composer)
-    composer = RealTextComposerAgent(model_id="Qwen/Qwen1.5-1.8B-Chat")
+    # Upgraded to 7B for actual musical intelligence
+    composer = RealTextComposerAgent(model_id="Qwen/Qwen2-7B-Instruct")
     
     # 2. Initialize the Audio Engine (The Instrument)
     tracker = InfiniteTracker(bpm=130)
@@ -60,7 +61,7 @@ def run_real_llm_demo():
     del judge
     torch.cuda.empty_cache()
     gc.collect()
-    composer = RealTextComposerAgent(model_id="Qwen/Qwen1.5-1.8B-Chat")
+    composer = RealTextComposerAgent(model_id="Qwen/Qwen2-7B-Instruct")
     
     # 6. Composer re-sequences based on the REAL critique
     print("\n>> Composer is rewriting the sequence based on the REAL critique (Draft 2)...")

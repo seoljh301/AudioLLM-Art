@@ -1,0 +1,10 @@
+codec: encodec_24khz
+device: cuda
+grain_size: 8        # latent frames @ 75 Hz ≈ 107 ms
+stride: 4            # source-corpus overlap
+target_stride: 8     # no target overlap (= equal to grain_size)
+temperature: 0.1     # 0=argmax, ∞=uniform
+overlap_add: true
+walk_strength: 0.0
+dry_wet: 1.0
+seed: 0

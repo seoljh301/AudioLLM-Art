@@ -119,6 +119,7 @@
   <a href="#max_p2">Net Max p2</a>
   <a href="#dyn">Net Dynamic</a>
   <a href="#meta">Meta-Symphony</a>
+  <a href="#v2">V2 Epic</a>
   <a href="#archive">Archive</a>
 </nav>
 <main>
@@ -493,57 +494,91 @@
 </div></div>
 </section>
 
-<section class="section" id="archive">
-  <h2>Earlier Masterpieces (archive)</h2>
-  <p class="blurb">Pre-multinet experiments from earlier sessions. 180 s 8-track layered masters with harmonic exciter / sub-boost / LUFS mastering.</p>
+<section class="section" id="v2">
+  <h2>Net Hyper-Max — 24 MVP × 180 s</h2>
+  <p class="blurb">프로젝트의 24 MVP 전부를 한 곡에 등장시키는 최대 규모 합주. 4 movement × 6 MVP × 45 s, 3 s cosine crossfade. Genesis (∅→audio) → Latent surge → Token storm → Final wash. 자세한 구조: docs/HYPER_MAX_ARCHITECTURE.md.</p>
   <div class="tracks">
 <div class="track">
-  <div class="title">Final Symphony Bass Heavy</div>
-  <div class="desc">180 s bass-heavy master. 80 Hz crossover +8 dB sub-boost.</div>
-  <img class="wave" src="runs/_thumbs/runs_masterpiece_final_symphony_bass_heavy_wav.png" alt="waveform">
-  <audio controls preload="none" src="runs/masterpiece/final_symphony_bass_heavy.wav"></audio>
-  <div class="meta">176.4s · 48 kHz · stereo · rms 0.363 · peak 0.980 · 32.3 MB · <a href="runs/masterpiece/final_symphony_bass_heavy.wav">download</a></div>
+  <div class="title">HYPER-MAX — MASTER (171 s)</div>
+  <div class="desc">24 MVP × 4 movement × 45 s. ∅→audio Genesis → Latent surge → Token storm → Final wash. crossfade 3 s × 3. procedural backend.</div>
+  <img class="wave" src="runs/_thumbs/runs_hyper_max_master_180s_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/hyper_max/master_180s.wav"></audio>
+  <div class="meta">171.0s · 22 kHz · mono · rms 0.068 · peak 0.558 · 7.2 MB · <a href="runs/hyper_max/master_180s.wav">download</a></div>
 </div>
 <div class="track">
-  <div class="title">Neural Granular Symphony</div>
-  <div class="desc">8 tracks fragmented into 250 ms grains, stochastic interweaving.</div>
-  <img class="wave" src="runs/_thumbs/runs_masterpiece_neural_granular_symphony_wav.png" alt="waveform">
-  <audio controls preload="none" src="runs/masterpiece/neural_granular_symphony.wav"></audio>
-  <div class="meta">176.4s · 48 kHz · stereo · rms 0.475 · peak 1.000 · 32.3 MB · <a href="runs/masterpiece/neural_granular_symphony.wav">download</a></div>
+  <div class="title">M1 Genesis (Y · O · H · P · S · D)</div>
+  <div class="desc">발원지 6 stem 합주. weight / latent / tokens / STFT / text 다섯 도메인 모두 ∅→audio.</div>
+  <img class="wave" src="runs/_thumbs/runs_hyper_max_movement_1_genesis_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/hyper_max/movement_1_genesis.wav"></audio>
+  <div class="meta">45.0s · 22 kHz · mono · rms 0.048 · peak 0.249 · 1.9 MB · <a href="runs/hyper_max/movement_1_genesis.wav">download</a></div>
 </div>
 <div class="track">
-  <div class="title">Full Spectrum Neural Galaxy</div>
-  <div class="desc">9-octave hyper-chord, triangular energy balancing.</div>
-  <img class="wave" src="runs/_thumbs/runs_masterpiece_full_spectrum_neural_galaxy_wav.png" alt="waveform">
-  <audio controls preload="none" src="runs/masterpiece/full_spectrum_neural_galaxy.wav"></audio>
-  <div class="meta">176.4s · 48 kHz · stereo · rms 0.469 · peak 1.000 · 32.3 MB · <a href="runs/masterpiece/full_spectrum_neural_galaxy.wav">download</a></div>
+  <div class="title">M2 Latent surge (A · E · F · G · K · U)</div>
+  <div class="desc">M1 입력 → 6 latent mutator 병렬. 마지막 U 가 caption bias 추가.</div>
+  <img class="wave" src="runs/_thumbs/runs_hyper_max_movement_2_latent_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/hyper_max/movement_2_latent.wav"></audio>
+  <div class="meta">45.0s · 22 kHz · mono · rms 0.021 · peak 0.149 · 1.9 MB · <a href="runs/hyper_max/movement_2_latent.wav">download</a></div>
 </div>
 <div class="track">
-  <div class="title">Hi-Fi Enhanced Symphony</div>
-  <div class="desc">Harmonic exciter ≥8 kHz + 14 kHz air boost.</div>
-  <img class="wave" src="runs/_thumbs/runs_masterpiece_hifi_enhanced_symphony_1_wav.png" alt="waveform">
-  <audio controls preload="none" src="runs/masterpiece/hifi_enhanced_symphony_1.wav"></audio>
-  <div class="meta">176.4s · 48 kHz · stereo · rms 0.152 · peak 0.960 · 32.3 MB · <a href="runs/masterpiece/hifi_enhanced_symphony_1.wav">download</a></div>
+  <div class="title">M3 Token storm (C · I · J · L · V · R)</div>
+  <div class="desc">M2 입력 → token 도메인 6 stem. R 이 자기 자신을 corpus 로 musaicing.</div>
+  <img class="wave" src="runs/_thumbs/runs_hyper_max_movement_3_tokens_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/hyper_max/movement_3_tokens.wav"></audio>
+  <div class="meta">45.0s · 22 kHz · mono · rms 0.119 · peak 0.558 · 1.9 MB · <a href="runs/hyper_max/movement_3_tokens.wav">download</a></div>
 </div>
 <div class="track">
-  <div class="title">Defined Neural Galaxy</div>
-  <div class="desc">Tukey-windowed granular reconstruction.</div>
-  <img class="wave" src="runs/_thumbs/runs_masterpiece_defined_neural_galaxy_wav.png" alt="waveform">
-  <audio controls preload="none" src="runs/masterpiece/defined_neural_galaxy.wav"></audio>
-  <div class="meta">176.4s · 48 kHz · stereo · rms 0.110 · peak 0.950 · 32.3 MB · <a href="runs/masterpiece/defined_neural_galaxy.wav">download</a></div>
+  <div class="title">M4 Final wash (Q · N · M · T · W · B)</div>
+  <div class="desc">전체 prior 를 corpus 로 사용. STFT/concat/recursive 6 stem 종합 wash.</div>
+  <img class="wave" src="runs/_thumbs/runs_hyper_max_movement_4_final_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/hyper_max/movement_4_final.wav"></audio>
+  <div class="meta">45.0s · 22 kHz · mono · rms 0.046 · peak 0.258 · 1.9 MB · <a href="runs/hyper_max/movement_4_final.wav">download</a></div>
+</div></div>
+</section>
+
+<section class="section" id="archive">
+  <h2>V2 — Ulaanbaatar Epic</h2>
+  <p class="blurb">AudioArt V2 의 첫 대작. Neural Physics (Temporal Warp · Latent Pan · MIDI Extraction · Speculative Restoration) 가 통합된 4-stem ensemble 마스터.</p>
+  <div class="tracks">
+<div class="track">
+  <div class="title">ULAANBAATAR EPIC V2 — MASTER</div>
+  <div class="desc">AudioArt V2 의 첫 대작. Neural Physics 통합 (Temporal Warp + Latent Pan + MIDI Extraction + Speculative Restoration). 4-stem ensemble + sub-anchor.</div>
+  <img class="wave" src="runs/_thumbs/runs_ulaanbaatar_epic_v2_ULAANBAATAR_EPIC_V2_MASTER_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/ulaanbaatar_epic_v2/ULAANBAATAR_EPIC_V2_MASTER.wav"></audio>
+  <div class="meta">4077.0s · 44 kHz · stereo · rms 0.313 · peak 0.850 · 685.9 MB · <a href="runs/ulaanbaatar_epic_v2/ULAANBAATAR_EPIC_V2_MASTER.wav">download</a></div>
 </div>
 <div class="track">
-  <div class="title">Neural Symphony 1 (original)</div>
-  <div class="desc">First multi-layer assembly, harmonic alignment.</div>
-  <img class="wave" src="runs/_thumbs/runs_masterpiece_neural_symphony_1_wav.png" alt="waveform">
-  <audio controls preload="none" src="runs/masterpiece/neural_symphony_1.wav"></audio>
-  <div class="meta">176.4s · 48 kHz · stereo · rms 0.378 · peak 1.000 · 32.3 MB · <a href="runs/masterpiece/neural_symphony_1.wav">download</a></div>
+  <div class="title">V2 Stem α</div>
+  <div class="desc">V2 ensemble 의 4-stem 중 α 줄기.</div>
+  <img class="wave" src="runs/_thumbs/runs_ulaanbaatar_epic_v2_stem_alpha_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/ulaanbaatar_epic_v2/stem_alpha.wav"></audio>
+  <div class="meta">3966.0s · 44 kHz · mono · rms 0.031 · peak 0.581 · 333.6 MB · <a href="runs/ulaanbaatar_epic_v2/stem_alpha.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">V2 Stem β</div>
+  <div class="desc">β 줄기.</div>
+  <img class="wave" src="runs/_thumbs/runs_ulaanbaatar_epic_v2_stem_beta_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/ulaanbaatar_epic_v2/stem_beta.wav"></audio>
+  <div class="meta">3914.9s · 44 kHz · mono · rms 0.249 · peak 0.965 · 329.3 MB · <a href="runs/ulaanbaatar_epic_v2/stem_beta.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">V2 Stem γ</div>
+  <div class="desc">γ 줄기.</div>
+  <img class="wave" src="runs/_thumbs/runs_ulaanbaatar_epic_v2_stem_gamma_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/ulaanbaatar_epic_v2/stem_gamma.wav"></audio>
+  <div class="meta">4046.8s · 44 kHz · mono · rms 0.040 · peak 0.898 · 340.4 MB · <a href="runs/ulaanbaatar_epic_v2/stem_gamma.wav">download</a></div>
+</div>
+<div class="track">
+  <div class="title">V2 Stem δ</div>
+  <div class="desc">δ 줄기.</div>
+  <img class="wave" src="runs/_thumbs/runs_ulaanbaatar_epic_v2_stem_delta_wav.png" alt="waveform">
+  <audio controls preload="none" src="runs/ulaanbaatar_epic_v2/stem_delta.wav"></audio>
+  <div class="meta">4077.0s · 44 kHz · mono · rms 0.487 · peak 1.000 · 342.9 MB · <a href="runs/ulaanbaatar_epic_v2/stem_delta.wav">download</a></div>
 </div></div>
 </section>
 
 </main>
 <footer>
-  Rendered <code>2026-05-27</code> from
+  Rendered <code>2026-05-30</code> from
   <code>scripts/build_demo.py</code>. See
   <a href="docs/MULTINET_ARCHITECTURE.md">MULTINET_ARCHITECTURE.md</a> and
   <a href="docs/META_SYMPHONY_ARCHITECTURE.md">META_SYMPHONY_ARCHITECTURE.md</a>

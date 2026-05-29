@@ -1,0 +1,8 @@
+duration_s: 12.0
+sr: 22050
+n_prompts: 3
+mix_mode: concat       # concat | blend
+custom_prompts: []
+permute_words: false
+use_real: false        # true 시 AudioLDM 시도; 실패하면 fallback
+seed: 0

@@ -1,0 +1,11 @@
+model_paths:
+  - checkpoints/rave/guitar_iil_b2048_r48000_z16.ts
+  - checkpoints/rave/organ_archive_b2048_r48000_z16.ts
+device: cuda
+duration_s: 10.0
+morph_t: 0.5
+morph_mode: linear
+latent_mode: smoothed
+latent_sigma: 1.0
+latent_smooth: 0.985
+seed: 0

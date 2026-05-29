@@ -8,12 +8,12 @@ from typing import List, Dict
 log = logging.getLogger("real_llm_agents")
 
 class RealTextComposerAgent:
-    """Uses a local HuggingFace LLM to dynamically generate Palettes and Sequences."""
+    """Uses a powerful 7B Local LLM to dynamically generate high-complexity IDM sequences."""
     
-    def __init__(self, model_id="Qwen/Qwen1.5-1.8B-Chat", device="cuda"):
-        # We use a smaller Qwen model (1.8B) so it easily fits in V100 VRAM alongside audio models.
+    def __init__(self, model_id="Qwen/Qwen2-7B-Instruct", device="cuda"):
+        # Upgraded to 7B model for better musical intelligence.
         self.device = device
-        log.info(f"Loading Local LLM: {model_id} on {device}...")
+        log.info(f"Loading Super-Intelligence LLM: {model_id}...")
         
         try:
             from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -21,10 +21,10 @@ class RealTextComposerAgent:
             self.model = AutoModelForCausalLM.from_pretrained(
                 model_id, 
                 torch_dtype=torch.float16, 
-                device_map="auto"
+                device_map="auto" # Auto-distribute across GPUs (e.g. CUDA 1,2,3)
             )
             self.model.eval()
-            log.info("Local LLM successfully loaded!")
+            log.info("Super-Intelligence LLM successfully loaded!")
         except Exception as e:
             log.error(f"Failed to load LLM: {e}")
             raise
@@ -71,7 +71,6 @@ class RealTextComposerAgent:
             
         # 3. Attempt to parse, if it fails due to truncation, try to fix it
         try:
-            # Try to parse to see if it's already valid
             parsed = json.loads(text)
             if isinstance(parsed, dict):
                 for k, v in parsed.items():
@@ -80,7 +79,6 @@ class RealTextComposerAgent:
                         break
             return json.dumps(parsed)
         except json.JSONDecodeError:
-            # It might be truncated. Find the last complete object.
             last_brace = text.rfind('}')
             if last_brace != -1:
                 text = text[:last_brace+1] + "\n]"
@@ -102,14 +100,9 @@ class RealTextComposerAgent:
         user_prompt = f"""
         Invent 4 unique synthetic percussive sounds for this theme: "{theme}".
         Provide the output as a JSON array where each object has:
-        - "symbol": a single uppercase letter (e.g. "K", "S", "X")
-        - "description": a short phrase describing how it sounds (e.g. "deep distorted kick", "glass shatter")
+        - "symbol": a single uppercase letter
+        - "description": a short phrase describing how it sounds
         - "duration": float between 0.1 and 0.4
-        
-        Example:
-        [
-          {{"symbol": "K", "description": "heavy metallic kick", "duration": 0.3}}
-        ]
         """
         response = self._generate_response(sys_prompt, user_prompt)
         json_str = self._extract_json(response)
@@ -117,27 +110,32 @@ class RealTextComposerAgent:
         return json_str
 
     def generate_sequence(self, palette_json: str, theme: str, critique: str = "") -> str:
-        """Asks the LLM to sequence the palette into a 32-step grid."""
-        sys_prompt = "You are a tracker sequencer programmer. Output ONLY valid JSON array. No explanations."
+        """Asks the 7B LLM to perform 'Musical CoT' before outputting a complex JSON grid."""
+        sys_prompt = "You are a professional IDM (Intelligent Dance Music) producer and tracker programmer. You specialize in complex, off-beat, and glitchy rhythms like Autechre or Aphex Twin."
         
         user_prompt = f"""
-        Here is your sound palette:
-        {palette_json}
-        
+        Sound palette: {palette_json}
         Theme: {theme}
-        {f'CRITIQUE OF PREVIOUS BEAT: {critique}' if critique else ''}
+        {f'CRITIQUE OF YOUR PREVIOUS ATTEMPT: {critique}' if critique else ''}
         
-        Create a 1-bar drum pattern. 1 bar has 32 steps (0 to 31).
-        Return a JSON array of events. Each event needs:
-        - "step": integer from 0 to 31
-        - "sample": the symbol of the sound (from the palette)
-        - "ratchet": integer 1, 2, 3, 4, or 8 (1 = normal hit, >1 = extremely fast stutter/glitch in that step)
+        TASK: Composing a 1-bar DENSE and EVOLVING IDM rhythm.
         
-        Make it sound like modern IDM / Glitch music. Use ratcheting on some hi-frequency sounds.
-        Output ONLY the JSON array.
+        PROCESS (Musical Chain-of-Thought):
+        1. Verbalize your rhythmic strategy. How will you use syncopation, ghost notes, and micro-timing to make it exciting and diverse?
+        2. Output the final JSON array.
+        
+        JSON SCHEMA RULES:
+        - "step": 0 to 31.
+        - "sample": Use ONLY symbols from the palette.
+        - "ratchet": 1 (normal) to 16 (extreme micro-stutter).
+        - "velocity": 0.1 to 1.0 (loudness of this hit).
+        - "offset_ms": -20 to 20 (pushes the hit forward or backward for 'wonky' groove).
+        
+        Place 18-25 events. Use complex groupings (e.g. 5-tuplets, 7-tuplets) by utilizing 'step' and 'offset_ms'.
+        
+        Output your thoughts first, then the JSON block.
         """
         response = self._generate_response(sys_prompt, user_prompt)
-        log.info(f"Raw LLM Sequence Response:\n{response}")
+        log.info(f"LLM Musical Thought & Response:\n{response}")
         json_str = self._extract_json(response)
-        log.info(f"Extracted Sequence JSON:\n{json_str}")
         return json_str

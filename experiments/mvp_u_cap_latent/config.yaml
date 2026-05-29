@@ -1,0 +1,7 @@
+bias_strength: 0.4
+chunk_seconds: 1.0
+use_real: false
+model_path: checkpoints/rave/guitar_iil_b2048_r48000_z16.ts
+device: cuda
+seed: 0
+dry_wet: 1.0

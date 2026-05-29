@@ -79,16 +79,31 @@ class InfiniteTracker:
             step = event.get("step")
             sample_key = event.get("sample")
             ratchet = event.get("ratchet", 1)
+            velocity = event.get("velocity", 1.0)
+            offset_ms = event.get("offset_ms", 0.0)
             
+            # Robustness fix: If the LLM hallucinates a symbol, pick the first available one
             if sample_key not in self.palette:
-                continue
+                if self.palette:
+                    alt_key = list(self.palette.keys())[0]
+                    log.warning(f"Key '{sample_key}' not in palette. Using '{alt_key}' instead.")
+                    sample_key = alt_key
+                else:
+                    continue
                 
-            sample_data = self.palette[sample_key]
-            step_start_idx = step * self.samples_per_step
+            sample_data = self.palette[sample_key] * velocity
+            
+            # Start position with micro-offset
+            offset_samples = int(offset_ms * self.sr / 1000.0)
+            step_start_idx = (step * self.samples_per_step) + offset_samples
+            
             ratchet_spacing = self.samples_per_step // ratchet
             
             for r in range(ratchet):
                 pos = step_start_idx + (r * ratchet_spacing)
+                # Ensure we don't write out of bounds
+                if pos < 0: continue 
+                
                 end_pos = min(pos + len(sample_data), total_samples)
                 length_to_write = end_pos - pos
                 if length_to_write > 0:

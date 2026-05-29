@@ -1,0 +1,9 @@
+grain_seconds: 2.0
+stride_seconds: 1.0
+seg_seconds: 4.0
+temperature: 0.2
+walk_strength: 0.0
+use_real: false
+sr: 22050
+crossfade_seconds: 0.05
+seed: 0
