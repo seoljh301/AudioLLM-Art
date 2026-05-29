@@ -15,26 +15,28 @@
 
 ## 2. 작동 프로세스 (The Neural Tracker Pipeline)
 
-### Phase 1: The Palette (음향 파편 수집)
-AudioLDM이나 코덱 벤딩(MVP-C)을 이용해 0.1~0.5초 길이의 개별 샘플(One-shots)을 준비합니다.
-*   `K` = Sub Kick
-*   `H` = Sharp Glitch Hat
-*   `S` = Metallic Snare/Clang
-*   `R` = Reverse Noise
+### Phase 1: Dynamic Palette Definition (음향 파편 창조)
+단순히 미리 정해진 샘플(Kick, Snare)을 쓰는 것을 넘어, LLM이 **자신이 쓸 악기를 스스로 정의(Prompting)**합니다. 텍스트 묘사를 바탕으로 AudioLDM이나 DSP 엔진이 해당 소리를 즉석에서 렌더링하여 팔레트에 등록합니다.
+
+**Palette JSON from LLM:**
+```json
+[
+  {"symbol": "K", "description": "heavy distorted sub kick", "duration": 0.4},
+  {"symbol": "G", "description": "glass shatter bright", "duration": 0.2},
+  {"symbol": "Z", "description": "laser zap synth drop", "duration": 0.1}
+]
+```
 
 ### Phase 2: LLM Track Programming (시퀀스 매트릭스 생성)
-텍스트 LLM에게 원하는 리듬의 미학을 설명하고, 미세 시간 축(예: 1마디를 32단계로 분할)에 대한 JSON 배열을 반환하도록 프롬프팅합니다.
+텍스트 LLM에게 원하는 리듬의 미학을 설명하고, 미세 시간 축(예: 1마디를 32단계로 분할)에 대한 JSON 배열을 반환하도록 프롬프팅합니다. 자신이 1단계에서 발명한 기호(Symbol)를 사용하여 리듬을 조립합니다.
 
-**Prompt to LLM:**
-> "너는 아방가르드 글리치 아티스트야. 1마디를 32개의 스텝(1/32 박자)으로 나누어 리듬을 디자인해 줘. 각 스텝에 들어갈 샘플 배열을 JSON으로 줘. 래칫(Ratchet, 하나의 스텝 내에서 소리를 여러 번 연타하는 기법)을 최대 4번까지 적용할 수 있어."
-
-**LLM Output (JSON):**
+**Sequence JSON from LLM:**
 ```json
 [
   {"step": 0, "sample": "K", "ratchet": 1},
-  {"step": 4, "sample": "H", "ratchet": 2},
-  {"step": 7, "sample": "H", "ratchet": 4}, 
-  {"step": 8, "sample": "S", "ratchet": 1},
+  {"step": 4, "sample": "Z", "ratchet": 4},
+  {"step": 8, "sample": "G", "ratchet": 1}, 
+  {"step": 12, "sample": "Z", "ratchet": 2},
   ...
 ]
 ```
