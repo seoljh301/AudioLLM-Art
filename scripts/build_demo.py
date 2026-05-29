@@ -250,6 +250,22 @@ META = [
           "meta", 0),
 ]
 
+V2 = [
+    Track("ULAANBAATAR EPIC V2 — MASTER",
+          "runs/ulaanbaatar_epic_v2/ULAANBAATAR_EPIC_V2_MASTER.wav",
+          "AudioArt V2 의 첫 대작. Neural Physics 통합 (Temporal Warp + Latent Pan + "
+          "MIDI Extraction + Speculative Restoration). 4-stem ensemble + sub-anchor.",
+          "v2", 0),
+    Track("V2 Stem α", "runs/ulaanbaatar_epic_v2/stem_alpha.wav",
+          "V2 ensemble 의 4-stem 중 α 줄기.", "v2", 1),
+    Track("V2 Stem β", "runs/ulaanbaatar_epic_v2/stem_beta.wav",
+          "β 줄기.", "v2", 2),
+    Track("V2 Stem γ", "runs/ulaanbaatar_epic_v2/stem_gamma.wav",
+          "γ 줄기.", "v2", 3),
+    Track("V2 Stem δ", "runs/ulaanbaatar_epic_v2/stem_delta.wav",
+          "δ 줄기.", "v2", 4),
+]
+
 ARCHIVE = [
     Track("Final Symphony Bass Heavy",
           "runs/masterpiece/final_symphony_bass_heavy.wav",
@@ -270,6 +286,12 @@ ARCHIVE = [
     Track("Neural Symphony 1 (original)",
           "runs/masterpiece/neural_symphony_1.wav",
           "First multi-layer assembly, harmonic alignment.", "archive", 5),
+    Track("Ulaanbaatar Neural Symphony",
+          "runs/masterpiece/ulaanbaatar_neural_symphony.wav",
+          "1시간 소스에 뉴럴 체인 적용한 마스터.", "archive", 6),
+    Track("Foundation Hyper-Chord (Earthquake)",
+          "runs/ulaanbaatar_master/foundation_hyperchord_final.wav",
+          "9-옥타브 hyper-chord + 50 Hz +15 dB EARTHQUAKE bass.", "archive", 7),
 ]
 
 
@@ -315,6 +337,11 @@ def main() -> None:
         "Network of networks. All four macro-nets generate stems on a 3-min sub-bass "
         "seed; LFOs braid them in stereo with a sub-re-injection anchor.",
         META))
+    sections_html.append(section_block(
+        "V2 — Ulaanbaatar Epic",
+        "AudioArt V2 의 첫 대작. Neural Physics (Temporal Warp · Latent Pan · MIDI "
+        "Extraction · Speculative Restoration) 가 통합된 4-stem ensemble 마스터.",
+        sorted(V2, key=lambda t: t.order)))
     sections_html.append(section_block(
         "Earlier Masterpieces (archive)",
         "Pre-multinet experiments from earlier sessions. 180 s 8-track layered "
@@ -442,6 +469,7 @@ def main() -> None:
   <a href="#max_p2">Net Max p2</a>
   <a href="#dyn">Net Dynamic</a>
   <a href="#meta">Meta-Symphony</a>
+  <a href="#v2">V2 Epic</a>
   <a href="#archive">Archive</a>
 </nav>
 <main>
@@ -451,7 +479,7 @@ def main() -> None:
               f'<section class="section" id="{sid}">')
     for s, sid in zip(sections_html,
                       ["seeds", "net1", "net2", "net3", "max_p1", "max_p2",
-                       "dyn", "meta", "archive"])
+                       "dyn", "meta", "v2", "archive"])
 )}
 </main>
 <footer>

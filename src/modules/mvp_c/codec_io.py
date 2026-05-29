@@ -98,18 +98,29 @@ def decode_tokens(handle: CodecHandle, tokens: np.ndarray) -> np.ndarray:
     codes = torch.from_numpy(tokens).long().to(handle.device)
     # Clamp invalid tokens (e.g. -1 from invalid_token mode) to a safe value.
     codes = torch.clamp(codes, 0, handle.codebook_size - 1)
-    codes = codes[None]  # (B=1, n_q, T)
+    
+    n_q, total_frames = codes.shape
+    
+    # Process in chunks of 4500 frames (~1 minute) to avoid VRAM OOM on massive files
+    chunk_size = 4500
+    audio_chunks = []
+    
+    for i in range(0, total_frames, chunk_size):
+        chunk_codes = codes[:, i : i + chunk_size]
+        chunk_codes = chunk_codes[None]  # (B=1, n_q, T)
 
-    if handle.name.startswith("encodec"):
-        out = handle.model.decode([(codes, None)])
-        return out[0, 0].cpu().numpy().astype(np.float32)
+        if handle.name.startswith("encodec"):
+            out = handle.model.decode([(chunk_codes, None)])
+            audio_chunks.append(out[0, 0].cpu().numpy().astype(np.float32))
 
-    if handle.name == "dac_44khz":
-        z = handle.model.quantizer.from_codes(codes)[0]
-        out = handle.model.decode(z)
-        return out[0, 0].cpu().numpy().astype(np.float32)
+        elif handle.name == "dac_44khz":
+            z = handle.model.quantizer.from_codes(chunk_codes)[0]
+            out = handle.model.decode(z)
+            audio_chunks.append(out[0, 0].cpu().numpy().astype(np.float32))
+        else:
+            raise ValueError(f"unknown codec: {handle.name}")
 
-    raise ValueError(f"unknown codec: {handle.name}")
+    return np.concatenate(audio_chunks) if audio_chunks else np.zeros(0, dtype=np.float32)
 
 
 def load_audio_mono(path: Path, target_sr: int) -> np.ndarray:

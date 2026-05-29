@@ -68,9 +68,30 @@ def _mix(dw=0.7, rms_match=True, low_anchor_hz=None, sub_boost_db=0.0,
                      low_anchor_hz=low_anchor_hz, sub_boost_db=sub_boost_db)
 
 
+from src.modules.mvp_j.mimi_bend import MimiBender, MimiBendParams, render_mimi_mock
+from src.modules.mvp_k.temporal_warp import NeuralTemporalWarp, WarpParams
+from src.modules.mvp_l.speculative_restoration import SpeculativeRestoration
+
 # ---------------------------------------------------------------------------
 # Stage runners
 # ---------------------------------------------------------------------------
+
+def stage_J(audio, *, semantic_rate=0.05, acoustic_rate=0.1, rng_seed=0):
+    params = MimiBendParams(mode="intertwined", semantic_rate=semantic_rate, acoustic_rate=acoustic_rate)
+    return render_mimi_mock(audio, params, np.random.default_rng(rng_seed))
+
+def stage_K(tokens, *, speeds=None):
+    warper = NeuralTemporalWarp()
+    if speeds is None:
+        speeds = np.array([1.0, 1.0, 0.8, 0.5, 0.5, 0.3, 0.3, 0.1])
+    params = WarpParams(layer_speeds=speeds)
+    return warper.warp_tokens(tokens, params)
+
+def stage_L(duration_s, sr, *, intensity=2.0):
+    restorer = SpeculativeRestoration()
+    noise = restorer.dream_from_noise(duration_s, sr, noise_type="white")
+    # In V2, we would then force_hallucination on the latent
+    return noise
 
 def stage_A(audio, rave, *, noise=0.05, drop=0.0, mode="smoothed", dw=0.7, rng_seed=0):
     cfg = ARenderCfg(mix=_mix(dw=dw), governor=_governor())

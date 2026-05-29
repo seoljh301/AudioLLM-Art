@@ -16,21 +16,40 @@ class OrganParams:
     duration_frames: int = 300    # length in tokens (approx 4s @ 75fps)
 
 
+def _get_primes(n: int) -> np.ndarray:
+    """Fast Sieve of Eratosthenes to get the first n primes."""
+    if n <= 0: return np.array([], dtype=np.int64)
+    
+    # Estimation for the nth prime: n * (log n + log log n)
+    # For n=306,000, max_val is roughly 4.5M.
+    if n < 6:
+        upper = 15
+    else:
+        upper = int(n * (np.log(n) + np.log(np.log(n))))
+    
+    sieve = np.ones(upper, dtype=bool)
+    sieve[0:2] = False
+    for i in range(2, int(np.sqrt(upper)) + 1):
+        if sieve[i]:
+            sieve[i*i : upper : i] = False
+            
+    primes = np.where(sieve)[0]
+    return primes[:n]
+
+
 def generate_tokens(n_q: int, params: OrganParams, rng: np.random.Generator) -> np.ndarray:
     """Generate (n_quantizers, time) token tensor."""
     t = params.duration_frames
     out = np.zeros((n_q, t), dtype=np.int64)
     
     if params.mode == "prime":
-        # Fill with prime numbers modulo 1024
-        primes = []
-        cand = 2
-        while len(primes) < t:
-            if all(cand % p != 0 for p in primes):
-                primes.append(cand)
-            cand += 1
-        
-        pattern = np.array(primes) % 1024
+        # Fast generation of primes modulo 1024
+        pattern = _get_primes(t) % 1024
+        # If we didn't get enough primes (due to estimation), pad with random
+        if len(pattern) < t:
+            pad = rng.integers(0, 1024, size=t - len(pattern))
+            pattern = np.concatenate([pattern, pad])
+            
         for q in range(n_q):
             out[q] = np.roll(pattern, q * params.stride)
 
